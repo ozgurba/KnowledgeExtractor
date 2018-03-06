@@ -40,7 +40,9 @@ public class KnowExtParserBaseListener implements KnowExtParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFunctionDecl(KnowExtParser.FunctionDeclContext ctx) { }
+	@Override public void enterFunctionDecl(KnowExtParser.FunctionDeclContext ctx) { 
+		System.out.println("KnowExtParserBaseListener:enterFunctionDecl"+ctx.getText());
+	}
 	/**
 	 * {@inheritDoc}
 	 *
