@@ -1,0 +1,15 @@
+// KnowExt test
+int g = 9;        // a global variable
+int deneme(int x) { // factorial function
+    if (x==0)
+		return 1;
+    return x * fact(x-1);
+}
+
+
+char deneme(char x) { // factorial function
+    if (x==0)
+		return '1';
+    return x;
+}
+
