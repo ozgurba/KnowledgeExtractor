@@ -1,5 +1,10 @@
 // KnowExt test
 int g = 9;        // a global variable
+int main(){
+	open("filename1");
+	merge("filename1","filename2");
+	extract("filename1","text1");
+}
 int deneme(int x) { // factorial function
     if (x==0)
 		return 1;

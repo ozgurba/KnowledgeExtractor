@@ -20,8 +20,11 @@ public static void main(String[] args) throws IOException {
     ParseTree tree = parser.blockStatement(); 
     ParseTreeWalker walker = new ParseTreeWalker(); // create standard walker
     ExtractInterfaceListener extractor = new ExtractInterfaceListener(parser);
-    walker.walk(extractor, tree); // initiate walk of tree with listener​
+    walker.walk(extractor, tree); // initiate walk of tree with listener
     System.out.println(tree.toStringTree(parser)); 
+    walker.walk(extractor, tree);
+    System.out.println(tree.toStringTree(parser)); 
+    
 	
 }
 
