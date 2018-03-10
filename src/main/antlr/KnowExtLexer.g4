@@ -25,6 +25,7 @@ WHILE: 				'while';
 TREE:				'tree';
 THROW:				'throw';
 TRY: 				'try';
+VOID: 				'void';
 UNION:				'union';
 SELECT:				'select';
 SET:				'set';
@@ -84,6 +85,18 @@ BITAND:             '&';
 BITOR:              '|';
 CARET:              '^';
 MOD:                '%';
+
+ADD_ASSIGN:         '+=';
+SUB_ASSIGN:         '-=';
+MUL_ASSIGN:         '*=';
+DIV_ASSIGN:         '/=';
+AND_ASSIGN:         '&=';
+OR_ASSIGN:          '|=';
+XOR_ASSIGN:         '^=';
+MOD_ASSIGN:         '%=';
+LSHIFT_ASSIGN:      '<<=';
+RSHIFT_ASSIGN:      '>>=';
+URSHIFT_ASSIGN:     '>>>=';
 
 // Whitespace and comments
 WS:                 [ \t\r\n\u000C]+ -> channel(HIDDEN);

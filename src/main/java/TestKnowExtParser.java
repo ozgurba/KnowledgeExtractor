@@ -1,8 +1,7 @@
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
+
+import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -14,10 +13,13 @@ import knowext.KnowExtParser;
 public class TestKnowExtParser {
 	
 public static void main(String[] args) throws IOException {
-	KnowExtLexer knowExtLexer=new KnowExtLexer(CharStreams.fromFileName("src/main/antlr/test.kext")); 
+	CharStream charStream = CharStreams.fromFileName("src/main/antlr/test.kext");
+	KnowExtLexer knowExtLexer=new KnowExtLexer(charStream); 
 	CommonTokenStream tokens = new CommonTokenStream(knowExtLexer); 
 	KnowExtParser parser = new KnowExtParser(tokens); 
-    ParseTree tree = parser.blockStatement(); 
+    ParseTree tree = parser.file(); 
+    System.out.println(tree.toStringTree(parser)); 
+    
     ParseTreeWalker walker = new ParseTreeWalker(); // create standard walker
     ExtractInterfaceListener extractor = new ExtractInterfaceListener(parser);
     walker.walk(extractor, tree); // initiate walk of tree with listener

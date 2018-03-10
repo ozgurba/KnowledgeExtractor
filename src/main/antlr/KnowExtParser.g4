@@ -9,8 +9,13 @@ varDecl
     ;
 
 functionDecl
-    :   typeType IDENTIFIER '(' formalParameters? ')' block // "void f(int x) {...}"
+    :   typeTypeOrVoid IDENTIFIER '(' formalParameters? ')' block // "void f(int x) {...}"
     ;
+    
+typeTypeOrVoid
+    : typeType
+    | VOID
+;
 formalParameters
     :   formalParameter (',' formalParameter)*
     ;
@@ -74,6 +79,7 @@ statement
     | RETURN expression? ';'
     | BREAK IDENTIFIER? ';'
     | CONTINUE IDENTIFIER? ';'
+    | SEMI
     | statementExpression=expression ';'
     | identifierLabel=IDENTIFIER ':' statement
    /*TODO | TRY block (catchClause+ finallyBlock? | finallyBlock)
@@ -117,12 +123,16 @@ expressionList
     : expression (',' expression)*
     ;
 
+methodCall
+    : IDENTIFIER '(' expressionList? ')'
+    ;
 
 expression
     : primary
     | expression '[' expression ']'
     | expression '(' expressionList? ')'
     | NEW creator
+    | methodCall
     | '(' typeType ')' expression
     | expression postfix=('++' | '--')
     | prefix=('+'|'-'|'++'|'--') expression
@@ -139,7 +149,12 @@ expression
     | expression bop='||' expression
     | expression bop='?' expression ':' expression
     | expression UNION expression
+    | <assoc=right> expression
+      bop=('=' | '+=' | '-=' | '*=' | '/=' | '&=' | '|=' | '^=' | '>>=' | '>>>=' | '<<=' | '%=')
+      expression
     ;
+      
+    
 primary
     : '(' expression ')'
     | literal
@@ -191,3 +206,4 @@ complexType
 arguments
     : '(' expressionList? ')'
 ;
+
