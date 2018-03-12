@@ -5,8 +5,10 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 
 	public KnowExtParser parser;
 	public boolean isMainMethod;
-	public ExtractInterfaceListener(KnowExtParser pparser) {
+	public KnowExtEngine knowExtengine;
+	public ExtractInterfaceListener(KnowExtParser pparser,KnowExtEngine pKnowExtengine) {
 		this.parser=pparser;
+		knowExtengine=pKnowExtengine;
 	}
 
 	@Override
@@ -26,7 +28,7 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 			isMainMethod=true;
 			break;
 		default:
-			System.out.println("Other Methods Entrance:"+methodName);	
+			System.out.println("Other Method Entrance:"+methodName);	
 			break;
 		}
 	}
@@ -42,10 +44,50 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 			isMainMethod=false;
 			break;
 		default:
-			System.out.println("Other Methods Exit:"+methodName);	
+			System.out.println("Other Method Exit:"+methodName);	
 			break;
 
 		}
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterMethodCall(KnowExtParser.MethodCallContext ctx) {
+		String methodName=ctx.IDENTIFIER().getText();
+		switch(methodName) {
+		case "open":
+			System.out.println("Open Method Call Entrance");
+			knowExtengine.open(ctx.expressionList(),isMainMethod);
+			break;
+		default:
+			System.out.println("Other Method Call Entrance:"+methodName);	
+			break;
+		
+			
+		}
+	}
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMethodCall(KnowExtParser.MethodCallContext ctx) {
+		String methodName=ctx.IDENTIFIER().getText();
+		switch(methodName) {
+		case "open":
+			System.out.println("Open Method Call Exit");
+			knowExtengine.open(ctx.expressionList(),isMainMethod);
+			break;
+		default:
+			System.out.println("Other Method Call Exit:"+methodName);	
+			break;
+		
+			
+		}
+	}
+
 
 }

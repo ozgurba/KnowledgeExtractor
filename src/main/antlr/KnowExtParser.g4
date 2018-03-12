@@ -130,7 +130,7 @@ methodCall
 expression
     : primary
     | expression '[' expression ']'
-    | expression '(' expressionList? ')'
+    //| expression '(' expressionList? ')'
     | NEW creator
     | methodCall
     | '(' typeType ')' expression
