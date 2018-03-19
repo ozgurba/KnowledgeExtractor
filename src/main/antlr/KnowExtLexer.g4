@@ -22,7 +22,7 @@ RETURN:             'return';
 SHORT:              'short';
 SWITCH:             'switch';
 WHILE: 				'while';
-TREE:				'tree';
+TREE:				'Tree';
 THROW:				'throw';
 TRY: 				'try';
 VOID: 				'void';
@@ -97,6 +97,9 @@ MOD_ASSIGN:         '%=';
 LSHIFT_ASSIGN:      '<<=';
 RSHIFT_ASSIGN:      '>>=';
 URSHIFT_ASSIGN:     '>>>=';
+
+
+
 
 // Whitespace and comments
 WS:                 [ \t\r\n\u000C]+ -> channel(HIDDEN);
