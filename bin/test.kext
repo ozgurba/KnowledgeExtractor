@@ -1,0 +1,16 @@
+// KnowExt test
+
+void main(){
+	Tree xmlTree1;
+	saveUrl("http://quotes.toscrape.com/tag/love/","quotes.xml");
+	xmlTree1=openFile("quotes.xml");
+	merge("filename1","filename2");
+	extract("filename1","text1");
+	if(i==5){
+		merge("filename3");
+		int x=i;
+		y=i;
+	}
+}
+
+int g = 9;        // a global variable
