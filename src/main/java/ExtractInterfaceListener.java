@@ -22,16 +22,16 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 	public KnowExtParser parser;
 	public boolean isMainMethod;
 	public KnowExtEngine knowExtengine;
-	Map<ParseTree,Object> values=new HashMap<ParseTree,Object>();
+	Map<ParseTree,Object> globalSymbolTable=new HashMap<ParseTree,Object>();
 
-	public void setValue(ParseTree node, int value) { values.put(node, value); }
+	public void setValue(ParseTree node, int value) { globalSymbolTable.put(node, value); }
 
-	public Object getValue(ParseTree node) { return values.get(node); }
+	public Object getValue(ParseTree node) { return globalSymbolTable.get(node); }
 
 	public void writeMemory() {
 		System.out.println("Program Memory");
-		for (ParseTree key : values.keySet()) {
-			System.out.println(key.getText()+":"+values.get(key));
+		for (ParseTree key : globalSymbolTable.keySet()) {
+			System.out.println(key.getText()+":"+globalSymbolTable.get(key));
 		}
 	}
 
@@ -90,25 +90,24 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 
 			switch(methodName) {
 			case "openFile":
-				String fileNameToOpen=(String)values.get(exprList.expr(0).primary().literal().STRING_LITERAL());
+				String fileNameToOpen=(String)globalSymbolTable.get(exprList.expr(0).primary().literal().STRING_LITERAL());
 				knowExtengine.openFile(fileNameToOpen);
 				logger.info("openFile Method Exit"+exprList.getText());
 				break;
 			case "saveUrl":
-				String urlAddress=(String)values.get(exprList.expr(0).primary().literal().STRING_LITERAL());
-				String fileNameToSave=(String)values.get(exprList.expr(1).primary().literal().STRING_LITERAL());
+				String urlAddress=(String)globalSymbolTable.get(exprList.expr(0).primary().literal().STRING_LITERAL());
+				String fileNameToSave=(String)globalSymbolTable.get(exprList.expr(1).primary().literal().STRING_LITERAL());
 
 				knowExtengine.saveUrl(urlAddress,fileNameToSave);
 				break;
 			case "openUrl":
-				String fileNameToOpenUrl=(String)values.get(exprList.expr(0).primary().literal().STRING_LITERAL());
+				String fileNameToOpenUrl=(String)globalSymbolTable.get(exprList.expr(0).primary().literal().STRING_LITERAL());
 				Tree t=knowExtengine.openUrl(fileNameToOpenUrl);
 				NodeAttributes nodeAttributes= new NodeAttributes();
 				nodeAttributes.value(t).type(EnumValues.NodeType.TREE);
-				values.put(ctx, nodeAttributes);
+				globalSymbolTable.put(ctx, nodeAttributes);
 				logger.info("openUrl Method Exit"+exprList.getText());
 				break;
-
 			default:
 				logger.info("Other Method Exit:"+methodName);	
 				break;
@@ -118,17 +117,17 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 			ExprContext expr1 = ctx.expr(0);
 			ExprContext expr2 = ctx.expr(1);
 			logger.info("Assign Operation:"+expr1.getText()+" :=: "+expr2.getText());
-			values.put(expr1, values.get(expr2));
-		} else if(ctx.ADD()!=null||ctx.SUB()!=null||ctx.MUL()!=null||ctx.DIV()!=null) {
+			globalSymbolTable.put(expr1, globalSymbolTable.get(expr2));
+		}else if(ctx.ADD()!=null||ctx.SUB()!=null||ctx.MUL()!=null||ctx.DIV()!=null) {
 			ExprContext expr1 = ctx.expr(0);
 			ExprContext expr2 = ctx.expr(1);
-			if(values.get(expr1)!=null&&values.get(expr2)!=null) {
-				EnumValues.NodeType expr1Type=((NodeAttributes)values.get(expr1)).getType();
-				EnumValues.NodeType expr2Type=((NodeAttributes)values.get(expr2)).getType();
+			if(globalSymbolTable.get(expr1)!=null&&globalSymbolTable.get(expr2)!=null) {
+				EnumValues.NodeType expr1Type=((NodeAttributes)globalSymbolTable.get(expr1)).getType();
+				EnumValues.NodeType expr2Type=((NodeAttributes)globalSymbolTable.get(expr2)).getType();
 				EnumValues.NodeType resultType=null;
 				if((resultType=isCompatible(expr1Type,expr2Type))!=null) {
-					Object expr1Value=((NodeAttributes)values.get(expr1)).getValue();
-					Object expr2Value=((NodeAttributes)values.get(expr2)).getValue();
+					Object expr1Value=((NodeAttributes)globalSymbolTable.get(expr1)).getValue();
+					Object expr2Value=((NodeAttributes)globalSymbolTable.get(expr2)).getValue();
 					Object resultValue=null;
 					if(ctx.ADD()!=null)
 						resultValue=add(expr1Value,expr2Value,resultType);
@@ -140,12 +139,30 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 						resultValue=divide(expr1Value,expr2Value,resultType);
 					NodeAttributes nodeAttributes=new NodeAttributes();
 					nodeAttributes.value(resultValue).type(resultType);
-					values.put(ctx, nodeAttributes);
+					globalSymbolTable.put(ctx, nodeAttributes);
 					logger.info("Adding/Substract/Multiply/Divide Operation:"+expr1.getText()+":OP:"+expr2.getText()+"="+resultValue);
+				} else {
+					logger.error("Incompatible Types:"+ctx.getText());
+					throw new UnsupportedOperationException();
 				}
 			}
-		} else if(ctx.primary()!=null) {
-			values.put(ctx, values.get(ctx.primary()));
+		} else if(ctx.EQUAL()!=null) {
+			ExprContext expr1 = ctx.expr(0);
+			ExprContext expr2 = ctx.expr(1);
+			EnumValues.NodeType expr1Type=((NodeAttributes)globalSymbolTable.get(expr1)).getType();
+			EnumValues.NodeType expr2Type=((NodeAttributes)globalSymbolTable.get(expr2)).getType();
+			Object expr1Value=((NodeAttributes)globalSymbolTable.get(expr1)).getValue();
+			Object expr2Value=((NodeAttributes)globalSymbolTable.get(expr2)).getValue();
+			NodeAttributes nodeAttributes=new NodeAttributes();
+			if(expr1Type==expr2Type&&expr1Value!=null&&expr1Value.equals(expr2Value)) {
+				nodeAttributes.value(Boolean.TRUE).type(NodeType.BOOL);
+			} else {
+				nodeAttributes.value(Boolean.FALSE).type(NodeType.BOOL);
+			}
+			globalSymbolTable.put(ctx, nodeAttributes);
+		} 
+		else if(ctx.primary()!=null) {
+			globalSymbolTable.put(ctx, globalSymbolTable.get(ctx.primary()));
 		}
 
 	}
@@ -257,18 +274,18 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 		if(stringLiteral!=null) {
 			NodeAttributes nodeAttributes=new NodeAttributes();
 			nodeAttributes.value(convertToStr(stringLiteral.getText())).type(EnumValues.NodeType.STRING);
-			values.put(ctx,nodeAttributes );
+			globalSymbolTable.put(ctx,nodeAttributes );
 			logger.info("String literal:"+stringLiteral);
 		}
 		else if(decimalLiteral!=null){
 			NodeAttributes nodeAttributes=new NodeAttributes();
 			nodeAttributes.value(Integer.parseInt(decimalLiteral.getText())).type(EnumValues.NodeType.INT);
-			values.put(ctx, nodeAttributes);
+			globalSymbolTable.put(ctx, nodeAttributes);
 			logger.info("Decimal literal:"+decimalLiteral);
 		} else if(boolLiteral!=null){
 			NodeAttributes nodeAttributes=new NodeAttributes();
 			nodeAttributes.value(Boolean.parseBoolean(boolLiteral.getText())).type(EnumValues.NodeType.BOOL);
-			values.put(ctx, nodeAttributes);
+			globalSymbolTable.put(ctx, nodeAttributes);
 			logger.info("Decimal literal:"+decimalLiteral);
 		} else {
 			logger.info("Other Literal Values");
@@ -295,9 +312,9 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 	 */
 	@Override public void exitPrimary(KnowExtParser.PrimaryContext ctx) { 
 		if(ctx.literal()!=null) {	
-			values.put(ctx, values.get(ctx.literal()));
+			globalSymbolTable.put(ctx, globalSymbolTable.get(ctx.literal()));
 		} else if(ctx.LPAREN()!=null) {
-			values.put(ctx, values.get(ctx.expr()));
+			globalSymbolTable.put(ctx, globalSymbolTable.get(ctx.expr()));
 		}
 	}
 	
