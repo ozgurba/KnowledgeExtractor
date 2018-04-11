@@ -11,7 +11,7 @@ options { tokenVocab=KnowExtLexer; }
 file:   (functionDecl | varDecl)+ ;
 
 varDecl
-    :   typeType IDENTIFIER ('=' expr)? ';'
+    :   typeType IDENTIFIER (ASSIGN expr)? ';'
     ;
     
 functionDecl
@@ -35,7 +35,6 @@ stat:   block
     |   varDecl
     |   IF parExpr stat (ELSE stat)?
     |   RETURN expr? ';'
-    |   expr '=' expr ';' // assignment
     |   expr ';'          // func call
     | varDecl ';'
     ;
@@ -47,17 +46,18 @@ parExpr
 expr:   primary
 	|	IDENTIFIER '(' exprList? ')'    // func call like f(), f(x), f(1,2)
     |   IDENTIFIER '[' expr ']'         // array index like a[i], a[i][j]
-    |   '-' expr                // unary minus
-    |   '!' expr                // boolean not
-    |   expr '*' expr
-    |   expr ('+'|'-') expr
-    |   expr '==' expr          // equality comparison (lowest priority op)
+    |   SUB expr                // unary minus
+    |   BANG expr                // boolean not
+    |   expr MUL expr
+    |   expr (ADD|SUB) expr
+    |   expr ASSIGN expr // assignment
+    |   expr EQUAL expr          // equality comparison (lowest priority op)
     |   IDENTIFIER                      // variable reference
-    |   '(' expr ')'
+    |   LPAREN expr RPAREN
     ;
     
 primary
-    : '(' expr ')'
+    : LPAREN expr RPAREN
     | literal
     | IDENTIFIER
 ;

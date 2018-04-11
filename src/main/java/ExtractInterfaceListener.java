@@ -1,12 +1,18 @@
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.log4j.Logger;
 
+import enums.EnumValues;
 import knowext.KnowExtParser;
+import knowext.KnowExtParser.ExprContext;
 import knowext.KnowExtParser.ExprListContext;
 import knowext.KnowExtParserBaseListener;
 
 public class ExtractInterfaceListener extends KnowExtParserBaseListener {
+
+	final static Logger logger = Logger.getLogger(ExtractInterfaceListener.class);
+
 
 	public KnowExtParser parser;
 	public boolean isMainMethod;
@@ -17,6 +23,11 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 
 	public Object getValue(ParseTree node) { return values.get(node); }
 
+	public void writeMemory() {
+		values.toString();
+	}
+
+
 	public ExtractInterfaceListener(KnowExtParser pparser,KnowExtEngine pKnowExtengine) {
 		this.parser=pparser;
 		knowExtengine=pKnowExtengine;
@@ -24,7 +35,7 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 
 	@Override
 	public void enterVarDecl(KnowExtParser.VarDeclContext ctx) {
-		System.out.println("::::"+ctx.getText());
+		logger.info("::::"+ctx.getText());
 	}
 
 	/**
@@ -35,11 +46,11 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 		String methodName=ctx.IDENTIFIER().getText();
 		switch(methodName) {
 		case "main":
-			System.out.println("Main Method Entrance");
+			logger.info("Main Method Entrance");
 			isMainMethod=true;
 			break;
 		default:
-			System.out.println("Other Method Entrance:"+methodName);	
+			logger.info("Other Method Entrance:"+methodName);	
 			break;
 		}
 	}
@@ -56,18 +67,6 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void enterExpr(KnowExtParser.ExprContext ctx) { 
-		if(ctx.IDENTIFIER()!=null) {
-			String methodName=ctx.IDENTIFIER().getText();
-			switch(methodName) {
-			case "open":
-				System.out.println("open Method Entrance");
-				break;
-			default:
-				System.out.println("Other Method Entrance:"+methodName);	
-				break;
-
-			}
-		}
 
 
 	}
@@ -80,52 +79,98 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 		if(ctx.IDENTIFIER()!=null) {
 			String methodName=ctx.IDENTIFIER().getText();
 			ExprListContext exprList = ctx.exprList();
-			
+
 			switch(methodName) {
 			case "openFile":
 				String fileNameToOpen=(String)values.get(exprList.expr(0).primary().literal().STRING_LITERAL());
 				knowExtengine.openFile(fileNameToOpen);
-				System.out.println("open Method Exit"+exprList.getText());
+				logger.info("openFile Method Exit"+exprList.getText());
 				break;
 			case "saveUrl":
 				String urlAddress=(String)values.get(exprList.expr(0).primary().literal().STRING_LITERAL());
 				String fileNameToSave=(String)values.get(exprList.expr(1).primary().literal().STRING_LITERAL());
-				
+
 				knowExtengine.saveUrl(urlAddress,fileNameToSave);
 				break;
+			case "openUrl":
+				String fileNameToOpenUrl=(String)values.get(exprList.expr(0).primary().literal().STRING_LITERAL());
+				Tree t=knowExtengine.openUrl(fileNameToOpenUrl);
+				NodeAttributes nodeAttributes= new NodeAttributes();
+				nodeAttributes.value(t).type(EnumValues.NodeType.TREE);
+				values.put(ctx, nodeAttributes);
+				logger.info("openUrl Method Exit"+exprList.getText());
+				break;
+
 			default:
-				System.out.println("Other Method Exit:"+methodName);	
+				logger.info("Other Method Exit:"+methodName);	
 				break;
 
 			}
+		} else if(ctx.ASSIGN()!=null){
+			
+			ExprContext expr1 = ctx.expr(0);
+			ExprContext op = ctx.expr(1);
+			ExprContext expr2 = ctx.expr(2);
+			if(op!=null)
+			logger.info("::"+ctx.getText()+"::"+op.getText());
+			if(expr1!=null&&expr2!=null) {
+				logger.info("Yupp!!");
+			}
+		} else if(ctx.ADD()!=null) {
+			
 		}
+
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLiteral(KnowExtParser.LiteralContext ctx) { }
+	@Override public void enterLiteral(KnowExtParser.LiteralContext ctx) {
+		logger.info("literalText:"+ctx.getText());
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitLiteral(KnowExtParser.LiteralContext ctx) { 
-		TerminalNode string_LITERAL = ctx.STRING_LITERAL();
-		if(string_LITERAL!=null) {
-			values.put(string_LITERAL, convertToStr(string_LITERAL.getText()));
-			System.out.println("String literal:"+string_LITERAL);
+		TerminalNode stringLiteral = ctx.STRING_LITERAL();
+		TerminalNode decimalLiteral=ctx.DECIMAL_LITERAL();
+		TerminalNode boolLiteral=ctx.BOOL_LITERAL();
+
+		if(stringLiteral!=null) {
+			values.put(stringLiteral, convertToStr(stringLiteral.getText()));
+			logger.info("String literal:"+stringLiteral);
 		}
-		else {
-			System.out.println("Other Literal Values");
+		else if(decimalLiteral!=null){
+			NodeAttributes nodeAttributes=new NodeAttributes();
+			nodeAttributes.value(Integer.parseInt(decimalLiteral.getText())).type(EnumValues.NodeType.INT);
+			values.put(decimalLiteral, nodeAttributes);
+			logger.info("Decimal literal:"+decimalLiteral);
+		} else if(boolLiteral!=null){
+			NodeAttributes nodeAttributes=new NodeAttributes();
+			nodeAttributes.value(Boolean.parseBoolean(boolLiteral.getText())).type(EnumValues.NodeType.BOOL);
+			values.put(decimalLiteral, nodeAttributes);
+			logger.info("Decimal literal:"+decimalLiteral);
+		} else {
+			logger.info("Other Literal Values");
 		}
 		//TODO other literals
 	}
-	
+
 	public static String convertToStr(String stringLiteral){
 		return stringLiteral.substring(1, stringLiteral.length()-1);
+	}
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void visitTerminal(TerminalNode node) {
+		//logger.info("Terminal Node:"+node);
+
 	}
 
 

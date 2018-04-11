@@ -1,16 +1,28 @@
 // KnowExt test
 
 void main(){
-	Tree xmlTree1;
+	p=8+9;
+	/*Tree xmlTree1;
 	saveUrl("http://quotes.toscrape.com/tag/love/","quotes.xml");
 	xmlTree1=openFile("quotes.xml");
+	openUrl("http://quotes.toscrape.com/tag/love/");
+	8+9;
+	Tree xmlTree2;
+	xmlTree2=openFile("quotes2.xml");
+	Tree xmlTree3=xmlTree2+xmlTree1;
+	//
+	//ilk olarak üstteki bilgiyi yapalým.
+	//symbol tablelarda neler yapýlacaktýr?
+	//variable declaration type safety tanýmlanmalýdýr.
+	//
+	//antlr'nin
 	merge("filename1","filename2");
 	extract("filename1","text1");
 	if(i==5){
 		merge("filename3");
 		int x=i;
 		y=i;
-	}
+	}*/
 }
 
-int g = 9;        // a global variable
+//int g = 9;        // a global variable
