@@ -23,6 +23,7 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 	public boolean isMainMethod;
 	public KnowExtEngine knowExtengine;
 	Map<ParseTree,Object> globalSymbolTable=new HashMap<ParseTree,Object>();
+	//TODO Change Symbol Table to Maven...
 
 	public void setValue(ParseTree node, int value) { globalSymbolTable.put(node, value); }
 
