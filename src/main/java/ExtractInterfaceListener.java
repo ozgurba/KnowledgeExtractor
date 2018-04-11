@@ -1,9 +1,14 @@
+import java.util.HashMap;
+import java.util.Map;
+
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.log4j.Logger;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 import enums.EnumValues;
+import enums.EnumValues.NodeType;
 import knowext.KnowExtParser;
 import knowext.KnowExtParser.ExprContext;
 import knowext.KnowExtParser.ExprListContext;
@@ -17,14 +22,17 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 	public KnowExtParser parser;
 	public boolean isMainMethod;
 	public KnowExtEngine knowExtengine;
-	ParseTreeProperty<Object> values=new ParseTreeProperty<>();
+	Map<ParseTree,Object> values=new HashMap<ParseTree,Object>();
 
 	public void setValue(ParseTree node, int value) { values.put(node, value); }
 
 	public Object getValue(ParseTree node) { return values.get(node); }
 
 	public void writeMemory() {
-		values.toString();
+		System.out.println("Program Memory");
+		for (ParseTree key : values.keySet()) {
+			System.out.println(key.getText()+":"+values.get(key));
+		}
 	}
 
 
@@ -107,19 +115,125 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 
 			}
 		} else if(ctx.ASSIGN()!=null){
-			
 			ExprContext expr1 = ctx.expr(0);
-			ExprContext op = ctx.expr(1);
-			ExprContext expr2 = ctx.expr(2);
-			if(op!=null)
-			logger.info("::"+ctx.getText()+"::"+op.getText());
-			if(expr1!=null&&expr2!=null) {
-				logger.info("Yupp!!");
+			ExprContext expr2 = ctx.expr(1);
+			logger.info("Assign Operation:"+expr1.getText()+" :=: "+expr2.getText());
+			values.put(expr1, values.get(expr2));
+		} else if(ctx.ADD()!=null||ctx.SUB()!=null||ctx.MUL()!=null||ctx.DIV()!=null) {
+			ExprContext expr1 = ctx.expr(0);
+			ExprContext expr2 = ctx.expr(1);
+			if(values.get(expr1)!=null&&values.get(expr2)!=null) {
+				EnumValues.NodeType expr1Type=((NodeAttributes)values.get(expr1)).getType();
+				EnumValues.NodeType expr2Type=((NodeAttributes)values.get(expr2)).getType();
+				EnumValues.NodeType resultType=null;
+				if((resultType=isCompatible(expr1Type,expr2Type))!=null) {
+					Object expr1Value=((NodeAttributes)values.get(expr1)).getValue();
+					Object expr2Value=((NodeAttributes)values.get(expr2)).getValue();
+					Object resultValue=null;
+					if(ctx.ADD()!=null)
+						resultValue=add(expr1Value,expr2Value,resultType);
+					else if(ctx.SUB()!=null)
+						resultValue=substract(expr1Value,expr2Value,resultType);
+					else if(ctx.MUL()!=null)
+						resultValue=multiply(expr1Value,expr2Value,resultType);
+					else if(ctx.DIV()!=null)
+						resultValue=divide(expr1Value,expr2Value,resultType);
+					NodeAttributes nodeAttributes=new NodeAttributes();
+					nodeAttributes.value(resultValue).type(resultType);
+					values.put(ctx, nodeAttributes);
+					logger.info("Adding/Substract/Multiply/Divide Operation:"+expr1.getText()+":OP:"+expr2.getText()+"="+resultValue);
+				}
 			}
-		} else if(ctx.ADD()!=null) {
-			
+		} else if(ctx.primary()!=null) {
+			values.put(ctx, values.get(ctx.primary()));
 		}
 
+	}
+
+	private Object divide(Object expr1Value, Object expr2Value, NodeType resultType) {
+		if(NodeType.INT.equals(resultType)) {
+			Integer result=((Integer)expr1Value).intValue()/((Integer)expr2Value).intValue();
+			return result;
+		} else if(NodeType.STRING.equals(resultType)) {
+			return new UnsupportedOperationException();
+		} else if(NodeType.DOUBLE.equals(resultType)) {
+			Double result=((Double)expr1Value).doubleValue()/((Double)expr2Value).doubleValue();
+			return result;
+		} else if(NodeType.TREE.equals(resultType)) {
+			return new UnsupportedOperationException();
+		} 
+		return null;
+	}
+
+	private Object multiply(Object expr1Value, Object expr2Value, NodeType resultType) {
+		if(NodeType.INT.equals(resultType)) {
+			Integer result=((Integer)expr1Value).intValue()*((Integer)expr2Value).intValue();
+			return result;
+		} else if(NodeType.STRING.equals(resultType)) {
+			return new UnsupportedOperationException();
+		} else if(NodeType.DOUBLE.equals(resultType)) {
+			Double result=((Double)expr1Value).doubleValue()*((Double)expr2Value).doubleValue();
+			return result;
+		} else if(NodeType.TREE.equals(resultType)) {
+			return new UnsupportedOperationException();
+		} 
+		return null;
+	}
+
+	private Object add(Object expr1Value, Object expr2Value, NodeType resultType) {
+		if(NodeType.INT.equals(resultType)) {
+			Integer result=((Integer)expr1Value).intValue()+((Integer)expr2Value).intValue();
+			return result;
+		} else if(NodeType.STRING.equals(resultType)) {
+			String result=((String)expr1Value)+(expr2Value.toString());
+			return result;
+		} else if(NodeType.DOUBLE.equals(resultType)) {
+			Double result=((Double)expr1Value).doubleValue()+((Double)expr2Value).doubleValue();
+			return result;
+		} else if(NodeType.TREE.equals(resultType)) {
+			Tree result=addTree((Tree)expr1Value,(Tree)expr2Value);
+			return result;
+		} 
+		return null;
+		
+	}
+	
+	private Object substract(Object expr1Value, Object expr2Value, NodeType resultType) {
+		if(NodeType.INT.equals(resultType)) {
+			Integer result=((Integer)expr1Value).intValue()-((Integer)expr2Value).intValue();
+			return result;
+		} else if(NodeType.STRING.equals(resultType)) {
+			return new UnsupportedOperationException();
+		} else if(NodeType.DOUBLE.equals(resultType)) {
+			Double result=((Double)expr1Value).doubleValue()-((Double)expr2Value).doubleValue();
+			return result;
+		} else if(NodeType.TREE.equals(resultType)) {
+			Tree result=substractTree((Tree)expr1Value,(Tree)expr2Value);
+			return result;
+		} 
+		return null;
+		
+	}
+
+	private Tree substractTree(Tree expr1Value, Tree expr2Value) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private Tree addTree(Tree expr1Value, Tree expr2Value) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private NodeType isCompatible(NodeType expr1Type, NodeType expr2Type) {
+		if(expr1Type.equals(expr2Type)) {
+			return expr1Type;
+		} else if(NodeType.STRING.equals(expr1Type)&&(NodeType.INT.equals(expr2Type)||NodeType.DOUBLE.equals(expr2Type))) {
+			return NodeType.STRING;
+		} else if((NodeType.INT.equals(expr1Type)&&NodeType.DOUBLE.equals(expr2Type))||(NodeType.INT.equals(expr2Type)&&NodeType.DOUBLE.equals(expr1Type))) {
+			return NodeType.DOUBLE;
+		}
+		return null;
 	}
 
 	/**
@@ -141,18 +255,20 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 		TerminalNode boolLiteral=ctx.BOOL_LITERAL();
 
 		if(stringLiteral!=null) {
-			values.put(stringLiteral, convertToStr(stringLiteral.getText()));
+			NodeAttributes nodeAttributes=new NodeAttributes();
+			nodeAttributes.value(convertToStr(stringLiteral.getText())).type(EnumValues.NodeType.STRING);
+			values.put(ctx,nodeAttributes );
 			logger.info("String literal:"+stringLiteral);
 		}
 		else if(decimalLiteral!=null){
 			NodeAttributes nodeAttributes=new NodeAttributes();
 			nodeAttributes.value(Integer.parseInt(decimalLiteral.getText())).type(EnumValues.NodeType.INT);
-			values.put(decimalLiteral, nodeAttributes);
+			values.put(ctx, nodeAttributes);
 			logger.info("Decimal literal:"+decimalLiteral);
 		} else if(boolLiteral!=null){
 			NodeAttributes nodeAttributes=new NodeAttributes();
 			nodeAttributes.value(Boolean.parseBoolean(boolLiteral.getText())).type(EnumValues.NodeType.BOOL);
-			values.put(decimalLiteral, nodeAttributes);
+			values.put(ctx, nodeAttributes);
 			logger.info("Decimal literal:"+decimalLiteral);
 		} else {
 			logger.info("Other Literal Values");
@@ -169,11 +285,21 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void visitTerminal(TerminalNode node) {
-		//logger.info("Terminal Node:"+node);
 
 	}
-
-
-
-
+	
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPrimary(KnowExtParser.PrimaryContext ctx) { 
+		if(ctx.literal()!=null) {	
+			values.put(ctx, values.get(ctx.literal()));
+		} else if(ctx.LPAREN()!=null) {
+			values.put(ctx, values.get(ctx.expr()));
+		}
+	}
+	
+	
 }

@@ -38,6 +38,16 @@ public interface KnowExtParserListener extends ParseTreeListener {
 	 */
 	void exitFunctionDecl(KnowExtParser.FunctionDeclContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link KnowExtParser#typeTypeOrVoid}.
+	 * @param ctx the parse tree
+	 */
+	void enterTypeTypeOrVoid(KnowExtParser.TypeTypeOrVoidContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link KnowExtParser#typeTypeOrVoid}.
+	 * @param ctx the parse tree
+	 */
+	void exitTypeTypeOrVoid(KnowExtParser.TypeTypeOrVoidContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link KnowExtParser#formalParameters}.
 	 * @param ctx the parse tree
 	 */
@@ -68,185 +78,35 @@ public interface KnowExtParserListener extends ParseTreeListener {
 	 */
 	void exitBlock(KnowExtParser.BlockContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#blockStatement}.
+	 * Enter a parse tree produced by {@link KnowExtParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void enterBlockStatement(KnowExtParser.BlockStatementContext ctx);
+	void enterStat(KnowExtParser.StatContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#blockStatement}.
+	 * Exit a parse tree produced by {@link KnowExtParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void exitBlockStatement(KnowExtParser.BlockStatementContext ctx);
+	void exitStat(KnowExtParser.StatContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#localVariableDeclaration}.
+	 * Enter a parse tree produced by {@link KnowExtParser#parExpr}.
 	 * @param ctx the parse tree
 	 */
-	void enterLocalVariableDeclaration(KnowExtParser.LocalVariableDeclarationContext ctx);
+	void enterParExpr(KnowExtParser.ParExprContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#localVariableDeclaration}.
+	 * Exit a parse tree produced by {@link KnowExtParser#parExpr}.
 	 * @param ctx the parse tree
 	 */
-	void exitLocalVariableDeclaration(KnowExtParser.LocalVariableDeclarationContext ctx);
+	void exitParExpr(KnowExtParser.ParExprContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#variableDeclarators}.
+	 * Enter a parse tree produced by {@link KnowExtParser#expr}.
 	 * @param ctx the parse tree
 	 */
-	void enterVariableDeclarators(KnowExtParser.VariableDeclaratorsContext ctx);
+	void enterExpr(KnowExtParser.ExprContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#variableDeclarators}.
+	 * Exit a parse tree produced by {@link KnowExtParser#expr}.
 	 * @param ctx the parse tree
 	 */
-	void exitVariableDeclarators(KnowExtParser.VariableDeclaratorsContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#variableDeclarator}.
-	 * @param ctx the parse tree
-	 */
-	void enterVariableDeclarator(KnowExtParser.VariableDeclaratorContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#variableDeclarator}.
-	 * @param ctx the parse tree
-	 */
-	void exitVariableDeclarator(KnowExtParser.VariableDeclaratorContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#variableDeclaratorId}.
-	 * @param ctx the parse tree
-	 */
-	void enterVariableDeclaratorId(KnowExtParser.VariableDeclaratorIdContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#variableDeclaratorId}.
-	 * @param ctx the parse tree
-	 */
-	void exitVariableDeclaratorId(KnowExtParser.VariableDeclaratorIdContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#variableInitializer}.
-	 * @param ctx the parse tree
-	 */
-	void enterVariableInitializer(KnowExtParser.VariableInitializerContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#variableInitializer}.
-	 * @param ctx the parse tree
-	 */
-	void exitVariableInitializer(KnowExtParser.VariableInitializerContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#arrayInitializer}.
-	 * @param ctx the parse tree
-	 */
-	void enterArrayInitializer(KnowExtParser.ArrayInitializerContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#arrayInitializer}.
-	 * @param ctx the parse tree
-	 */
-	void exitArrayInitializer(KnowExtParser.ArrayInitializerContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#literal}.
-	 * @param ctx the parse tree
-	 */
-	void enterLiteral(KnowExtParser.LiteralContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#literal}.
-	 * @param ctx the parse tree
-	 */
-	void exitLiteral(KnowExtParser.LiteralContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#integerLiteral}.
-	 * @param ctx the parse tree
-	 */
-	void enterIntegerLiteral(KnowExtParser.IntegerLiteralContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#integerLiteral}.
-	 * @param ctx the parse tree
-	 */
-	void exitIntegerLiteral(KnowExtParser.IntegerLiteralContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void enterStatement(KnowExtParser.StatementContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void exitStatement(KnowExtParser.StatementContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#switchBlockStatementGroup}.
-	 * @param ctx the parse tree
-	 */
-	void enterSwitchBlockStatementGroup(KnowExtParser.SwitchBlockStatementGroupContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#switchBlockStatementGroup}.
-	 * @param ctx the parse tree
-	 */
-	void exitSwitchBlockStatementGroup(KnowExtParser.SwitchBlockStatementGroupContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#switchLabel}.
-	 * @param ctx the parse tree
-	 */
-	void enterSwitchLabel(KnowExtParser.SwitchLabelContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#switchLabel}.
-	 * @param ctx the parse tree
-	 */
-	void exitSwitchLabel(KnowExtParser.SwitchLabelContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#forControl}.
-	 * @param ctx the parse tree
-	 */
-	void enterForControl(KnowExtParser.ForControlContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#forControl}.
-	 * @param ctx the parse tree
-	 */
-	void exitForControl(KnowExtParser.ForControlContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#forInit}.
-	 * @param ctx the parse tree
-	 */
-	void enterForInit(KnowExtParser.ForInitContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#forInit}.
-	 * @param ctx the parse tree
-	 */
-	void exitForInit(KnowExtParser.ForInitContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#enhancedForControl}.
-	 * @param ctx the parse tree
-	 */
-	void enterEnhancedForControl(KnowExtParser.EnhancedForControlContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#enhancedForControl}.
-	 * @param ctx the parse tree
-	 */
-	void exitEnhancedForControl(KnowExtParser.EnhancedForControlContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#parExpression}.
-	 * @param ctx the parse tree
-	 */
-	void enterParExpression(KnowExtParser.ParExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#parExpression}.
-	 * @param ctx the parse tree
-	 */
-	void exitParExpression(KnowExtParser.ParExpressionContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#expressionList}.
-	 * @param ctx the parse tree
-	 */
-	void enterExpressionList(KnowExtParser.ExpressionListContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#expressionList}.
-	 * @param ctx the parse tree
-	 */
-	void exitExpressionList(KnowExtParser.ExpressionListContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#expression}.
-	 * @param ctx the parse tree
-	 */
-	void enterExpression(KnowExtParser.ExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#expression}.
-	 * @param ctx the parse tree
-	 */
-	void exitExpression(KnowExtParser.ExpressionContext ctx);
+	void exitExpr(KnowExtParser.ExprContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link KnowExtParser#primary}.
 	 * @param ctx the parse tree
@@ -258,55 +118,15 @@ public interface KnowExtParserListener extends ParseTreeListener {
 	 */
 	void exitPrimary(KnowExtParser.PrimaryContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#creator}.
+	 * Enter a parse tree produced by {@link KnowExtParser#exprList}.
 	 * @param ctx the parse tree
 	 */
-	void enterCreator(KnowExtParser.CreatorContext ctx);
+	void enterExprList(KnowExtParser.ExprListContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#creator}.
+	 * Exit a parse tree produced by {@link KnowExtParser#exprList}.
 	 * @param ctx the parse tree
 	 */
-	void exitCreator(KnowExtParser.CreatorContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#createdName}.
-	 * @param ctx the parse tree
-	 */
-	void enterCreatedName(KnowExtParser.CreatedNameContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#createdName}.
-	 * @param ctx the parse tree
-	 */
-	void exitCreatedName(KnowExtParser.CreatedNameContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#arrayCreatorRest}.
-	 * @param ctx the parse tree
-	 */
-	void enterArrayCreatorRest(KnowExtParser.ArrayCreatorRestContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#arrayCreatorRest}.
-	 * @param ctx the parse tree
-	 */
-	void exitArrayCreatorRest(KnowExtParser.ArrayCreatorRestContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#nonWildcardTypeArguments}.
-	 * @param ctx the parse tree
-	 */
-	void enterNonWildcardTypeArguments(KnowExtParser.NonWildcardTypeArgumentsContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#nonWildcardTypeArguments}.
-	 * @param ctx the parse tree
-	 */
-	void exitNonWildcardTypeArguments(KnowExtParser.NonWildcardTypeArgumentsContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#typeList}.
-	 * @param ctx the parse tree
-	 */
-	void enterTypeList(KnowExtParser.TypeListContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#typeList}.
-	 * @param ctx the parse tree
-	 */
-	void exitTypeList(KnowExtParser.TypeListContext ctx);
+	void exitExprList(KnowExtParser.ExprListContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link KnowExtParser#typeType}.
 	 * @param ctx the parse tree
@@ -317,6 +137,16 @@ public interface KnowExtParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitTypeType(KnowExtParser.TypeTypeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link KnowExtParser#literal}.
+	 * @param ctx the parse tree
+	 */
+	void enterLiteral(KnowExtParser.LiteralContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link KnowExtParser#literal}.
+	 * @param ctx the parse tree
+	 */
+	void exitLiteral(KnowExtParser.LiteralContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link KnowExtParser#primitiveType}.
 	 * @param ctx the parse tree
@@ -337,14 +167,4 @@ public interface KnowExtParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitComplexType(KnowExtParser.ComplexTypeContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link KnowExtParser#arguments}.
-	 * @param ctx the parse tree
-	 */
-	void enterArguments(KnowExtParser.ArgumentsContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link KnowExtParser#arguments}.
-	 * @param ctx the parse tree
-	 */
-	void exitArguments(KnowExtParser.ArgumentsContext ctx);
 }

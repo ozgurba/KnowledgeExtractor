@@ -1,7 +1,7 @@
 // KnowExt test
 
 void main(){
-	p=8+9;
+	p="str"+((8+9)-7*5)/6;
 	/*Tree xmlTree1;
 	saveUrl("http://quotes.toscrape.com/tag/love/","quotes.xml");
 	xmlTree1=openFile("quotes.xml");

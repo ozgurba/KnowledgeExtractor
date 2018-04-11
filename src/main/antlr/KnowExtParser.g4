@@ -48,7 +48,7 @@ expr:   primary
     |   IDENTIFIER '[' expr ']'         // array index like a[i], a[i][j]
     |   SUB expr                // unary minus
     |   BANG expr                // boolean not
-    |   expr MUL expr
+    |   expr (MUL|DIV) expr
     |   expr (ADD|SUB) expr
     |   expr ASSIGN expr // assignment
     |   expr EQUAL expr          // equality comparison (lowest priority op)

@@ -28,7 +28,6 @@ public static void main(String[] args) throws IOException {
     ExtractInterfaceListener extractor = new ExtractInterfaceListener(parser, knowExtEngine);
     walker.walk(extractor, tree); // initiate walk of tree with listener
     System.out.println(tree.toStringTree(parser)); 
-    System.out.println("Program Memory");
     extractor.writeMemory();
     
 	
