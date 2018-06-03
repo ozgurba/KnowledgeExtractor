@@ -49,7 +49,7 @@ dependencies {
 }
 generateGrammarSource {
    outputDirectory = file("src/main/java/knowext")
-    arguments += ["-package", "knowext"]
+    arguments += ["-package", "parser"]
     
     doLast {
     copy {
