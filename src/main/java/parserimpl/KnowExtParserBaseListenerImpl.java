@@ -1,4 +1,4 @@
-package parser.impl;
+package parserimpl;
 
 import java.util.HashMap;
 import java.util.Map;

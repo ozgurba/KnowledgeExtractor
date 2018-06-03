@@ -48,14 +48,14 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 }
 generateGrammarSource {
-   outputDirectory = file("src/main/java/knowext")
+   outputDirectory = file("src/main/java/parser")
     arguments += ["-package", "parser"]
     
     doLast {
     copy {
       from "target/generated-sources/antlr4/main/antlr"
       include "*.*"
-      into "src/main/java/knowext"
+      into "src/main/java/parser"
     }
     project.delete fileTree("target/generated-sources/antlr4/main/antlr").include("*.*")
   }

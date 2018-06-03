@@ -11,8 +11,8 @@ import org.apache.log4j.PropertyConfigurator;
 
 import parser.KnowExtLexer;
 import parser.KnowExtParser;
-import parser.impl.KnowExtEngine;
-import parser.impl.KnowExtParserBaseListenerImpl;
+import parserimpl.KnowExtEngine;
+import parserimpl.KnowExtParserBaseListenerImpl;
 
 public class KnowExtParserMainClass {
 
