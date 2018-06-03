@@ -6,6 +6,6 @@ public class EnumValues {
 	}
 
 	public enum NodeType {
-		INT, DOUBLE, BOOL, STRING, TREE, METHOD;
+		INT, DOUBLE, CHAR, BOOL, STRING, TREE, LIST, SET, METHOD, LONG, FLOAT, SHORT, BYTE;
 	}
 }

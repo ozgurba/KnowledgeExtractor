@@ -17,4 +17,9 @@ public class Tree {
 		this.doc = doc;
 	}
 
+	@Override
+	public String toString() {
+		return "Tree [doc=" + doc + "]";
+	}
+
 }

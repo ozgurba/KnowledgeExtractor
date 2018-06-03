@@ -14,10 +14,11 @@ import entity.Tree;
 public class KnowExtEngine {
 	final static Logger logger = Logger.getLogger(KnowExtEngine.class);
 
-	public String openFile(String fileName) {
+	public Tree openFile(String fileName) {
 		logger.info("openFile:" + fileName);
-
-		return null;
+		Document doc = JSoupCrawler.crawlFile(fileName);
+		Tree tree = new Tree(doc);
+		return tree;
 
 	}
 

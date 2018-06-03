@@ -37,6 +37,23 @@ public class JSoupCrawler {
 
 	}
 
+	public static org.jsoup.nodes.Document crawlFile(String url) {
+
+		try {
+			logger.info("Converter.crawlUrlPage:" + url);
+			File in = new File(url);
+			org.jsoup.nodes.Document doc = Jsoup.parse(in, "UTF-8");
+			// Remove all script and style elements and those of class "hidden".
+			doc.select("script, style, .hidden,comment, CDATA, #comment,meta, nbsp, input").remove();
+			removeComments(doc);
+			return doc;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+
+	}
+
 	public static String htmlToXML(String htmlStr) {
 		String unescapeEntities = Parser.unescapeEntities(htmlStr, false);
 		org.jsoup.nodes.Document document = Jsoup.parseBodyFragment(unescapeEntities);
