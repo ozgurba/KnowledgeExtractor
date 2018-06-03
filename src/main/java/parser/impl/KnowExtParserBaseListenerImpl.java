@@ -1,236 +1,257 @@
+package parser.impl;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.log4j.Logger;
-import org.antlr.v4.runtime.tree.ParseTree;
 
-import enums.EnumValues;
-import enums.EnumValues.NodeType;
-import knowext.KnowExtParser;
-import knowext.KnowExtParser.ExprContext;
-import knowext.KnowExtParser.ExprListContext;
-import knowext.KnowExtParserBaseListener;
+import entity.NodeAttributes;
+import entity.Tree;
+import entity.enums.EnumValues;
+import entity.enums.EnumValues.NodeType;
+import parser.KnowExtParser;
+import parser.KnowExtParser.ExprContext;
+import parser.KnowExtParser.ExprListContext;
+import parser.KnowExtParserBaseListener;
 
-public class ExtractInterfaceListener extends KnowExtParserBaseListener {
+public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 
-	final static Logger logger = Logger.getLogger(ExtractInterfaceListener.class);
-
+	final static Logger logger = Logger.getLogger(KnowExtParserBaseListenerImpl.class);
 
 	public KnowExtParser parser;
 	public boolean isMainMethod;
 	public KnowExtEngine knowExtengine;
-	Map<ParseTree,Object> globalSymbolTable=new HashMap<ParseTree,Object>();
-	//TODO Change Symbol Table to Maven...
+	Map<ParseTree, Object> globalSymbolTable = new HashMap<ParseTree, Object>();
+	// TODO Change Symbol Table to Maven...
 
-	public void setValue(ParseTree node, int value) { globalSymbolTable.put(node, value); }
+	public void setValue(ParseTree node, int value) {
+		globalSymbolTable.put(node, value);
+	}
 
-	public Object getValue(ParseTree node) { return globalSymbolTable.get(node); }
+	public Object getValue(ParseTree node) {
+		return globalSymbolTable.get(node);
+	}
 
 	public void writeMemory() {
 		System.out.println("Program Memory");
 		for (ParseTree key : globalSymbolTable.keySet()) {
-			System.out.println(key.getText()+":"+globalSymbolTable.get(key));
+			System.out.println(key.getText() + ":" + globalSymbolTable.get(key));
 		}
 	}
 
-
-	public ExtractInterfaceListener(KnowExtParser pparser,KnowExtEngine pKnowExtengine) {
-		this.parser=pparser;
-		knowExtengine=pKnowExtengine;
+	public KnowExtParserBaseListenerImpl(KnowExtParser pparser, KnowExtEngine pKnowExtengine) {
+		this.parser = pparser;
+		knowExtengine = pKnowExtengine;
 	}
 
 	@Override
 	public void enterVarDecl(KnowExtParser.VarDeclContext ctx) {
-		logger.info("::::"+ctx.getText());
+		logger.info("::::" + ctx.getText());
 	}
 
 	/**
 	 * Enter a parse tree produced by {@link KnowExtParser#functionDecl}.
-	 * @param ctx the parse tree
+	 * 
+	 * @param ctx
+	 *            the parse tree
 	 */
+	@Override
 	public void enterFunctionDecl(KnowExtParser.FunctionDeclContext ctx) {
-		String methodName=ctx.IDENTIFIER().getText();
-		switch(methodName) {
+		String methodName = ctx.IDENTIFIER().getText();
+		switch (methodName) {
 		case "main":
 			logger.info("Main Method Entrance");
-			isMainMethod=true;
+			isMainMethod = true;
 			break;
 		default:
-			logger.info("Other Method Entrance:"+methodName);	
+			logger.info("Other Method Entrance:" + methodName);
 			break;
 		}
 	}
+
 	/**
 	 * Exit a parse tree produced by {@link KnowExtParser#functionDecl}.
-	 * @param ctx the parse tree
+	 * 
+	 * @param ctx
+	 *            the parse tree
 	 */
-	public void exitFunctionDecl(KnowExtParser.FunctionDeclContext ctx){
+	@Override
+	public void exitFunctionDecl(KnowExtParser.FunctionDeclContext ctx) {
 	}
 
 	/**
 	 * {@inheritDoc}
 	 *
-	 * <p>The default implementation does nothing.</p>
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
 	 */
-	@Override public void enterExpr(KnowExtParser.ExprContext ctx) { 
-
+	@Override
+	public void enterExpr(KnowExtParser.ExprContext ctx) {
 
 	}
+
 	/**
 	 * {@inheritDoc}
 	 *
-	 * <p>The default implementation does nothing.</p>
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
 	 */
-	@Override public void exitExpr(KnowExtParser.ExprContext ctx) {
-		if(ctx.IDENTIFIER()!=null) {
-			String methodName=ctx.IDENTIFIER().getText();
+	@Override
+	public void exitExpr(KnowExtParser.ExprContext ctx) {
+		if (ctx.IDENTIFIER() != null) {
+			String methodName = ctx.IDENTIFIER().getText();
 			ExprListContext exprList = ctx.exprList();
 
-			switch(methodName) {
+			switch (methodName) {
 			case "openFile":
-				String fileNameToOpen=(String)globalSymbolTable.get(exprList.expr(0).primary().literal().STRING_LITERAL());
+				String fileNameToOpen = (String) globalSymbolTable
+						.get(exprList.expr(0).primary().literal().STRING_LITERAL());
 				knowExtengine.openFile(fileNameToOpen);
-				logger.info("openFile Method Exit"+exprList.getText());
+				logger.info("openFile Method Exit" + exprList.getText());
 				break;
 			case "saveUrl":
-				String urlAddress=(String)globalSymbolTable.get(exprList.expr(0).primary().literal().STRING_LITERAL());
-				String fileNameToSave=(String)globalSymbolTable.get(exprList.expr(1).primary().literal().STRING_LITERAL());
+				String urlAddress = (String) globalSymbolTable
+						.get(exprList.expr(0).primary().literal().STRING_LITERAL());
+				String fileNameToSave = (String) globalSymbolTable
+						.get(exprList.expr(1).primary().literal().STRING_LITERAL());
 
-				knowExtengine.saveUrl(urlAddress,fileNameToSave);
+				knowExtengine.saveUrl(urlAddress, fileNameToSave);
 				break;
 			case "openUrl":
-				String fileNameToOpenUrl=(String)globalSymbolTable.get(exprList.expr(0).primary().literal().STRING_LITERAL());
-				Tree t=knowExtengine.openUrl(fileNameToOpenUrl);
-				NodeAttributes nodeAttributes= new NodeAttributes();
+				String fileNameToOpenUrl = (String) globalSymbolTable
+						.get(exprList.expr(0).primary().literal().STRING_LITERAL());
+				Tree t = knowExtengine.openUrl(fileNameToOpenUrl);
+				NodeAttributes nodeAttributes = new NodeAttributes();
 				nodeAttributes.value(t).type(EnumValues.NodeType.TREE);
 				globalSymbolTable.put(ctx, nodeAttributes);
-				logger.info("openUrl Method Exit"+exprList.getText());
+				logger.info("openUrl Method Exit" + exprList.getText());
 				break;
 			default:
-				logger.info("Other Method Exit:"+methodName);	
+				logger.info("Other Method Exit:" + methodName);
 				break;
 
 			}
-		} else if(ctx.ASSIGN()!=null){
+		} else if (ctx.ASSIGN() != null) {
 			ExprContext expr1 = ctx.expr(0);
 			ExprContext expr2 = ctx.expr(1);
-			logger.info("Assign Operation:"+expr1.getText()+" :=: "+expr2.getText());
+			logger.info("Assign Operation:" + expr1.getText() + " :=: " + expr2.getText());
 			globalSymbolTable.put(expr1, globalSymbolTable.get(expr2));
-		}else if(ctx.ADD()!=null||ctx.SUB()!=null||ctx.MUL()!=null||ctx.DIV()!=null) {
+		} else if (ctx.ADD() != null || ctx.SUB() != null || ctx.MUL() != null || ctx.DIV() != null) {
 			ExprContext expr1 = ctx.expr(0);
 			ExprContext expr2 = ctx.expr(1);
-			if(globalSymbolTable.get(expr1)!=null&&globalSymbolTable.get(expr2)!=null) {
-				EnumValues.NodeType expr1Type=((NodeAttributes)globalSymbolTable.get(expr1)).getType();
-				EnumValues.NodeType expr2Type=((NodeAttributes)globalSymbolTable.get(expr2)).getType();
-				EnumValues.NodeType resultType=null;
-				if((resultType=isCompatible(expr1Type,expr2Type))!=null) {
-					Object expr1Value=((NodeAttributes)globalSymbolTable.get(expr1)).getValue();
-					Object expr2Value=((NodeAttributes)globalSymbolTable.get(expr2)).getValue();
-					Object resultValue=null;
-					if(ctx.ADD()!=null)
-						resultValue=add(expr1Value,expr2Value,resultType);
-					else if(ctx.SUB()!=null)
-						resultValue=substract(expr1Value,expr2Value,resultType);
-					else if(ctx.MUL()!=null)
-						resultValue=multiply(expr1Value,expr2Value,resultType);
-					else if(ctx.DIV()!=null)
-						resultValue=divide(expr1Value,expr2Value,resultType);
-					NodeAttributes nodeAttributes=new NodeAttributes();
+			if (globalSymbolTable.get(expr1) != null && globalSymbolTable.get(expr2) != null) {
+				EnumValues.NodeType expr1Type = ((NodeAttributes) globalSymbolTable.get(expr1)).getType();
+				EnumValues.NodeType expr2Type = ((NodeAttributes) globalSymbolTable.get(expr2)).getType();
+				EnumValues.NodeType resultType = null;
+				if ((resultType = isCompatible(expr1Type, expr2Type)) != null) {
+					Object expr1Value = ((NodeAttributes) globalSymbolTable.get(expr1)).getValue();
+					Object expr2Value = ((NodeAttributes) globalSymbolTable.get(expr2)).getValue();
+					Object resultValue = null;
+					if (ctx.ADD() != null)
+						resultValue = add(expr1Value, expr2Value, resultType);
+					else if (ctx.SUB() != null)
+						resultValue = substract(expr1Value, expr2Value, resultType);
+					else if (ctx.MUL() != null)
+						resultValue = multiply(expr1Value, expr2Value, resultType);
+					else if (ctx.DIV() != null)
+						resultValue = divide(expr1Value, expr2Value, resultType);
+					NodeAttributes nodeAttributes = new NodeAttributes();
 					nodeAttributes.value(resultValue).type(resultType);
 					globalSymbolTable.put(ctx, nodeAttributes);
-					logger.info("Adding/Substract/Multiply/Divide Operation:"+expr1.getText()+":OP:"+expr2.getText()+"="+resultValue);
+					logger.info("Adding/Substract/Multiply/Divide Operation:" + expr1.getText() + ":OP:"
+							+ expr2.getText() + "=" + resultValue);
 				} else {
-					logger.error("Incompatible Types:"+ctx.getText());
+					logger.error("Incompatible Types:" + ctx.getText());
 					throw new UnsupportedOperationException();
 				}
 			}
-		} else if(ctx.EQUAL()!=null) {
+		} else if (ctx.EQUAL() != null) {
 			ExprContext expr1 = ctx.expr(0);
 			ExprContext expr2 = ctx.expr(1);
-			EnumValues.NodeType expr1Type=((NodeAttributes)globalSymbolTable.get(expr1)).getType();
-			EnumValues.NodeType expr2Type=((NodeAttributes)globalSymbolTable.get(expr2)).getType();
-			Object expr1Value=((NodeAttributes)globalSymbolTable.get(expr1)).getValue();
-			Object expr2Value=((NodeAttributes)globalSymbolTable.get(expr2)).getValue();
-			NodeAttributes nodeAttributes=new NodeAttributes();
-			if(expr1Type==expr2Type&&expr1Value!=null&&expr1Value.equals(expr2Value)) {
+			EnumValues.NodeType expr1Type = ((NodeAttributes) globalSymbolTable.get(expr1)).getType();
+			EnumValues.NodeType expr2Type = ((NodeAttributes) globalSymbolTable.get(expr2)).getType();
+			Object expr1Value = ((NodeAttributes) globalSymbolTable.get(expr1)).getValue();
+			Object expr2Value = ((NodeAttributes) globalSymbolTable.get(expr2)).getValue();
+			NodeAttributes nodeAttributes = new NodeAttributes();
+			if (expr1Type == expr2Type && expr1Value != null && expr1Value.equals(expr2Value)) {
 				nodeAttributes.value(Boolean.TRUE).type(NodeType.BOOL);
 			} else {
 				nodeAttributes.value(Boolean.FALSE).type(NodeType.BOOL);
 			}
 			globalSymbolTable.put(ctx, nodeAttributes);
-		} 
-		else if(ctx.primary()!=null) {
+		} else if (ctx.primary() != null) {
 			globalSymbolTable.put(ctx, globalSymbolTable.get(ctx.primary()));
 		}
 
 	}
 
 	private Object divide(Object expr1Value, Object expr2Value, NodeType resultType) {
-		if(NodeType.INT.equals(resultType)) {
-			Integer result=((Integer)expr1Value).intValue()/((Integer)expr2Value).intValue();
+		if (NodeType.INT.equals(resultType)) {
+			Integer result = ((Integer) expr1Value).intValue() / ((Integer) expr2Value).intValue();
 			return result;
-		} else if(NodeType.STRING.equals(resultType)) {
+		} else if (NodeType.STRING.equals(resultType)) {
 			return new UnsupportedOperationException();
-		} else if(NodeType.DOUBLE.equals(resultType)) {
-			Double result=((Double)expr1Value).doubleValue()/((Double)expr2Value).doubleValue();
+		} else if (NodeType.DOUBLE.equals(resultType)) {
+			Double result = ((Double) expr1Value).doubleValue() / ((Double) expr2Value).doubleValue();
 			return result;
-		} else if(NodeType.TREE.equals(resultType)) {
+		} else if (NodeType.TREE.equals(resultType)) {
 			return new UnsupportedOperationException();
-		} 
+		}
 		return null;
 	}
 
 	private Object multiply(Object expr1Value, Object expr2Value, NodeType resultType) {
-		if(NodeType.INT.equals(resultType)) {
-			Integer result=((Integer)expr1Value).intValue()*((Integer)expr2Value).intValue();
+		if (NodeType.INT.equals(resultType)) {
+			Integer result = ((Integer) expr1Value).intValue() * ((Integer) expr2Value).intValue();
 			return result;
-		} else if(NodeType.STRING.equals(resultType)) {
+		} else if (NodeType.STRING.equals(resultType)) {
 			return new UnsupportedOperationException();
-		} else if(NodeType.DOUBLE.equals(resultType)) {
-			Double result=((Double)expr1Value).doubleValue()*((Double)expr2Value).doubleValue();
+		} else if (NodeType.DOUBLE.equals(resultType)) {
+			Double result = ((Double) expr1Value).doubleValue() * ((Double) expr2Value).doubleValue();
 			return result;
-		} else if(NodeType.TREE.equals(resultType)) {
+		} else if (NodeType.TREE.equals(resultType)) {
 			return new UnsupportedOperationException();
-		} 
+		}
 		return null;
 	}
 
 	private Object add(Object expr1Value, Object expr2Value, NodeType resultType) {
-		if(NodeType.INT.equals(resultType)) {
-			Integer result=((Integer)expr1Value).intValue()+((Integer)expr2Value).intValue();
+		if (NodeType.INT.equals(resultType)) {
+			Integer result = ((Integer) expr1Value).intValue() + ((Integer) expr2Value).intValue();
 			return result;
-		} else if(NodeType.STRING.equals(resultType)) {
-			String result=((String)expr1Value)+(expr2Value.toString());
+		} else if (NodeType.STRING.equals(resultType)) {
+			String result = ((String) expr1Value) + (expr2Value.toString());
 			return result;
-		} else if(NodeType.DOUBLE.equals(resultType)) {
-			Double result=((Double)expr1Value).doubleValue()+((Double)expr2Value).doubleValue();
+		} else if (NodeType.DOUBLE.equals(resultType)) {
+			Double result = ((Double) expr1Value).doubleValue() + ((Double) expr2Value).doubleValue();
 			return result;
-		} else if(NodeType.TREE.equals(resultType)) {
-			Tree result=addTree((Tree)expr1Value,(Tree)expr2Value);
+		} else if (NodeType.TREE.equals(resultType)) {
+			Tree result = addTree((Tree) expr1Value, (Tree) expr2Value);
 			return result;
-		} 
+		}
 		return null;
-		
+
 	}
-	
+
 	private Object substract(Object expr1Value, Object expr2Value, NodeType resultType) {
-		if(NodeType.INT.equals(resultType)) {
-			Integer result=((Integer)expr1Value).intValue()-((Integer)expr2Value).intValue();
+		if (NodeType.INT.equals(resultType)) {
+			Integer result = ((Integer) expr1Value).intValue() - ((Integer) expr2Value).intValue();
 			return result;
-		} else if(NodeType.STRING.equals(resultType)) {
+		} else if (NodeType.STRING.equals(resultType)) {
 			return new UnsupportedOperationException();
-		} else if(NodeType.DOUBLE.equals(resultType)) {
-			Double result=((Double)expr1Value).doubleValue()-((Double)expr2Value).doubleValue();
+		} else if (NodeType.DOUBLE.equals(resultType)) {
+			Double result = ((Double) expr1Value).doubleValue() - ((Double) expr2Value).doubleValue();
 			return result;
-		} else if(NodeType.TREE.equals(resultType)) {
-			Tree result=substractTree((Tree)expr1Value,(Tree)expr2Value);
+		} else if (NodeType.TREE.equals(resultType)) {
+			Tree result = substractTree((Tree) expr1Value, (Tree) expr2Value);
 			return result;
-		} 
+		}
 		return null;
-		
+
 	}
 
 	private Tree substractTree(Tree expr1Value, Tree expr2Value) {
@@ -244,11 +265,13 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 	}
 
 	private NodeType isCompatible(NodeType expr1Type, NodeType expr2Type) {
-		if(expr1Type.equals(expr2Type)) {
+		if (expr1Type.equals(expr2Type)) {
 			return expr1Type;
-		} else if(NodeType.STRING.equals(expr1Type)&&(NodeType.INT.equals(expr2Type)||NodeType.DOUBLE.equals(expr2Type))) {
+		} else if (NodeType.STRING.equals(expr1Type)
+				&& (NodeType.INT.equals(expr2Type) || NodeType.DOUBLE.equals(expr2Type))) {
 			return NodeType.STRING;
-		} else if((NodeType.INT.equals(expr1Type)&&NodeType.DOUBLE.equals(expr2Type))||(NodeType.INT.equals(expr2Type)&&NodeType.DOUBLE.equals(expr1Type))) {
+		} else if ((NodeType.INT.equals(expr1Type) && NodeType.DOUBLE.equals(expr2Type))
+				|| (NodeType.INT.equals(expr2Type) && NodeType.DOUBLE.equals(expr1Type))) {
 			return NodeType.DOUBLE;
 		}
 		return null;
@@ -257,67 +280,79 @@ public class ExtractInterfaceListener extends KnowExtParserBaseListener {
 	/**
 	 * {@inheritDoc}
 	 *
-	 * <p>The default implementation does nothing.</p>
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
 	 */
-	@Override public void enterLiteral(KnowExtParser.LiteralContext ctx) {
-		logger.info("literalText:"+ctx.getText());
+	@Override
+	public void enterLiteral(KnowExtParser.LiteralContext ctx) {
+		logger.info("literalText:" + ctx.getText());
 	}
+
 	/**
 	 * {@inheritDoc}
 	 *
-	 * <p>The default implementation does nothing.</p>
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
 	 */
-	@Override public void exitLiteral(KnowExtParser.LiteralContext ctx) { 
+	@Override
+	public void exitLiteral(KnowExtParser.LiteralContext ctx) {
 		TerminalNode stringLiteral = ctx.STRING_LITERAL();
-		TerminalNode decimalLiteral=ctx.DECIMAL_LITERAL();
-		TerminalNode boolLiteral=ctx.BOOL_LITERAL();
+		TerminalNode decimalLiteral = ctx.DECIMAL_LITERAL();
+		TerminalNode boolLiteral = ctx.BOOL_LITERAL();
 
-		if(stringLiteral!=null) {
-			NodeAttributes nodeAttributes=new NodeAttributes();
+		if (stringLiteral != null) {
+			NodeAttributes nodeAttributes = new NodeAttributes();
 			nodeAttributes.value(convertToStr(stringLiteral.getText())).type(EnumValues.NodeType.STRING);
-			globalSymbolTable.put(ctx,nodeAttributes );
-			logger.info("String literal:"+stringLiteral);
-		}
-		else if(decimalLiteral!=null){
-			NodeAttributes nodeAttributes=new NodeAttributes();
+			globalSymbolTable.put(ctx, nodeAttributes);
+			logger.info("String literal:" + stringLiteral);
+		} else if (decimalLiteral != null) {
+			NodeAttributes nodeAttributes = new NodeAttributes();
 			nodeAttributes.value(Integer.parseInt(decimalLiteral.getText())).type(EnumValues.NodeType.INT);
 			globalSymbolTable.put(ctx, nodeAttributes);
-			logger.info("Decimal literal:"+decimalLiteral);
-		} else if(boolLiteral!=null){
-			NodeAttributes nodeAttributes=new NodeAttributes();
+			logger.info("Decimal literal:" + decimalLiteral);
+		} else if (boolLiteral != null) {
+			NodeAttributes nodeAttributes = new NodeAttributes();
 			nodeAttributes.value(Boolean.parseBoolean(boolLiteral.getText())).type(EnumValues.NodeType.BOOL);
 			globalSymbolTable.put(ctx, nodeAttributes);
-			logger.info("Decimal literal:"+decimalLiteral);
+			logger.info("Decimal literal:" + decimalLiteral);
 		} else {
 			logger.info("Other Literal Values");
 		}
-		//TODO other literals
+		// TODO other literals
 	}
 
-	public static String convertToStr(String stringLiteral){
-		return stringLiteral.substring(1, stringLiteral.length()-1);
+	public static String convertToStr(String stringLiteral) {
+		return stringLiteral.substring(1, stringLiteral.length() - 1);
 	}
+
 	/**
 	 * {@inheritDoc}
 	 *
-	 * <p>The default implementation does nothing.</p>
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
 	 */
-	@Override public void visitTerminal(TerminalNode node) {
+	@Override
+	public void visitTerminal(TerminalNode node) {
 
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 *
-	 * <p>The default implementation does nothing.</p>
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
 	 */
-	@Override public void exitPrimary(KnowExtParser.PrimaryContext ctx) { 
-		if(ctx.literal()!=null) {	
+	@Override
+	public void exitPrimary(KnowExtParser.PrimaryContext ctx) {
+		if (ctx.literal() != null) {
 			globalSymbolTable.put(ctx, globalSymbolTable.get(ctx.literal()));
-		} else if(ctx.LPAREN()!=null) {
+		} else if (ctx.LPAREN() != null) {
 			globalSymbolTable.put(ctx, globalSymbolTable.get(ctx.expr()));
 		}
 	}
-	
-	
+
 }

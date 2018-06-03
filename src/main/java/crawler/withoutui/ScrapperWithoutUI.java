@@ -1,3 +1,5 @@
+package crawler.withoutui;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -7,7 +9,7 @@ import org.basex.core.BaseXException;
 import org.basex.examples.local.RunQueries;
 import org.jsoup.nodes.Document;
 
-import converter.Converter;
+import crawler.JSoupCrawler;
 import parameters.ScrapperParameter;
 import parameters.ScrapperUrl;
 
@@ -18,14 +20,14 @@ public class ScrapperWithoutUI {
 
 	public static void main(String args[]) throws BaseXException {
 		System.out.println("Starting processing of" + xmlProcessingParametersFileLocationStr);
-		ScrapperParameter scrapperParameter = Converter
+		ScrapperParameter scrapperParameter = JSoupCrawler
 				.readScrapperParametersFromXmlFile(xmlProcessingParametersFileLocationStr);
 		List<ScrapperUrl> scrapperUrlList = scrapperParameter.getScrapperUrlList();
 		if (!isCrawled) {
 			for (ScrapperUrl scrapperUrl : scrapperUrlList) {
 				if (scrapperUrl.getParentId() == null || scrapperUrl.getParentId().equals("")) {
-					final Document crawledDoc = Converter.crawlUrlPage(scrapperUrl.getUrlStr());
-					String xmlDocumentStr = Converter.htmlToXML(crawledDoc.html());
+					final Document crawledDoc = JSoupCrawler.crawlUrlPage(scrapperUrl.getUrlStr());
+					String xmlDocumentStr = JSoupCrawler.htmlToXML(crawledDoc.html());
 					try {
 						FileUtils.writeStringToFile(new File(xmlPath + "" + scrapperUrl.getId() + ".xml"),
 								xmlDocumentStr, "UTF-8");
@@ -49,9 +51,8 @@ public class ScrapperWithoutUI {
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
-			}
-			else{
-				//child query execution
+			} else {
+				// child query execution
 			}
 		}
 

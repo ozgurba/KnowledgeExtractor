@@ -1,7 +1,6 @@
-package converter;
+package crawler;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -18,10 +17,9 @@ import org.w3c.dom.NodeList;
 import parameters.ScrapperParameter;
 import parameters.ScrapperUrl;
 
+public class JSoupCrawler {
+	final static Logger logger = Logger.getLogger(JSoupCrawler.class);
 
-public class Converter {
-	final static Logger logger = Logger.getLogger(Converter.class);
-	
 	public static org.jsoup.nodes.Document crawlUrlPage(String url) {
 
 		try {
@@ -49,22 +47,22 @@ public class Converter {
 	}
 
 	private static void removeComments(org.jsoup.nodes.Document doc) {
-		List<org.jsoup.nodes.Node> nodeList=doc.childNodes();
-		for(org.jsoup.nodes.Node node:nodeList) {
+		List<org.jsoup.nodes.Node> nodeList = doc.childNodes();
+		for (org.jsoup.nodes.Node node : nodeList) {
 			removeComments(node);
 		}
 	}
 
 	private static void removeComments(org.jsoup.nodes.Node node) {
-		for (int i = 0; i < node.childNodes().size(); ) {
-            org.jsoup.nodes.Node child = node.childNode(i);
-            if (child.nodeName().equals("#comment"))
-                child.remove();
-            else {
-                removeComments(child);
-                i++;
-            }
-        }
+		for (int i = 0; i < node.childNodes().size();) {
+			org.jsoup.nodes.Node child = node.childNode(i);
+			if (child.nodeName().equals("#comment"))
+				child.remove();
+			else {
+				removeComments(child);
+				i++;
+			}
+		}
 	}
 
 	public static ScrapperParameter readScrapperParametersFromXmlFile(String paramfileLoc) {
@@ -111,4 +109,3 @@ public class Converter {
 	}
 
 }
-

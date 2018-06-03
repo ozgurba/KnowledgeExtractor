@@ -1,3 +1,5 @@
+package entity;
+
 import org.jsoup.nodes.Document;
 
 public class Tree {
@@ -14,6 +16,5 @@ public class Tree {
 	public void setDoc(Document doc) {
 		this.doc = doc;
 	}
-	
 
 }
