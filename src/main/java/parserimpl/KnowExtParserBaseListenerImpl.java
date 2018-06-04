@@ -2,6 +2,7 @@ package parserimpl;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -440,11 +441,11 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 		nodeAttributes.type(type).scope(ScopeType.GLOBAL).name(identifier.getText());
 		if (ctx.expr() != null) {
 			Object value = globalSymbolTable.get(ctx.expr());
-			if ((type.equals(NodeType.TREE) && value != null
-					&& !((NodeAttributes) value).getValue().getClass().equals(Tree.class))) {
+			if (!isSuitableToGivenType(type, value)) {
 				try {
-					throw new ParserException("Invalid type assignment: " + value.getClass() + " is assigned to "
-							+ NodeType.TREE + " type");
+					throw new ParserException(
+							"Invalid type assignment: " + ((NodeAttributes) value).getValue().getClass()
+									+ " is assigned to " + NodeType.TREE + " type");
 				} catch (ParserException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -461,6 +462,40 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private boolean isSuitableToGivenType(NodeType type, Object value) {
+		boolean isSuitable = true;
+		if (value == null || ((NodeAttributes) value).getValue() == null)
+			isSuitable = true;
+		else if (type.equals(NodeType.TREE)) {
+			isSuitable = ((NodeAttributes) value).getValue().getClass().isAssignableFrom(Tree.class);
+		} else if (type.equals(NodeType.SET)) {
+			isSuitable = Set.class.isAssignableFrom(((NodeAttributes) value).getValue().getClass());
+
+		} else if (type.equals(NodeType.LIST)) {
+			isSuitable = List.class.isAssignableFrom(((NodeAttributes) value).getValue().getClass());
+		} else if (type.equals(NodeType.INT)) {
+			isSuitable = Integer.class.isAssignableFrom(((NodeAttributes) value).getValue().getClass());
+		} else if (type.equals(NodeType.STRING)) {
+			isSuitable = String.class.isAssignableFrom(((NodeAttributes) value).getValue().getClass());
+		} else if (type.equals(NodeType.BOOL)) {
+			isSuitable = Boolean.class.isAssignableFrom(((NodeAttributes) value).getValue().getClass());
+		} else if (type.equals(NodeType.CHAR)) {
+			isSuitable = Character.class.isAssignableFrom(((NodeAttributes) value).getValue().getClass());
+		} else if (type.equals(NodeType.BYTE)) {
+			isSuitable = Byte.class.isAssignableFrom(((NodeAttributes) value).getValue().getClass());
+		} else if (type.equals(NodeType.DOUBLE)) {
+			isSuitable = Double.class.isAssignableFrom(((NodeAttributes) value).getValue().getClass());
+		} else if (type.equals(NodeType.FLOAT)) {
+			isSuitable = Float.class.isAssignableFrom(((NodeAttributes) value).getValue().getClass());
+		} else if (type.equals(NodeType.SHORT)) {
+			isSuitable = Short.class.isAssignableFrom(((NodeAttributes) value).getValue().getClass());
+		} else {
+			isSuitable = false;
+		}
+
+		return isSuitable;
 	}
 
 }

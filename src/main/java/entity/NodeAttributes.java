@@ -8,6 +8,7 @@ public class NodeAttributes {
 	private String name;
 	public static final String ANONYMOUS = "Anonymous";
 	private EnumValues.ScopeType scope;
+	private int lineNumber;
 
 	public NodeAttributes() {
 		setName(ANONYMOUS);
@@ -99,6 +100,19 @@ public class NodeAttributes {
 		if (type != other.type)
 			return false;
 		return true;
+	}
+
+	public int getLineNumber() {
+		return lineNumber;
+	}
+
+	public void setLineNumber(int lineNumber) {
+		this.lineNumber = lineNumber;
+	}
+
+	public NodeAttributes lineNumber(int lineNumber) {
+		this.lineNumber = lineNumber;
+		return this;
 	}
 
 }
