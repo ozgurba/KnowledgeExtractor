@@ -1,10 +1,12 @@
 package entity;
 
 import org.jsoup.nodes.Document;
+//import com.scalified.tree.TreeNode;
+//import com.scalified.tree.multinode.ArrayMultiTreeNode;
 
 public class Tree {
 	private Document doc;
-
+	//TreeNode<String> n1 = new ArrayMultiTreeNode<>("n1");
 	public Tree(Document doc) {
 		setDoc(doc);
 	}

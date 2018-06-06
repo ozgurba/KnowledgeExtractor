@@ -1,6 +1,11 @@
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Properties;
 
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -31,6 +36,17 @@ public class KnowExtParserMainClass {
 		walker.walk(extractor, tree); // initiate walk of tree with listener
 		System.out.println(tree.toStringTree(parser));
 		extractor.writeMemory();
+		//show AST in GUI
+        JFrame frame = new JFrame("Antlr AST");
+        JPanel panel = new JPanel();
+        TreeViewer viewr = new TreeViewer(Arrays.asList(
+                parser.getRuleNames()),tree);
+        viewr.setScale(1);//scale a little
+        panel.add(viewr);
+        frame.add(panel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(1000,1000);
+        frame.setVisible(true);
 
 	}
 

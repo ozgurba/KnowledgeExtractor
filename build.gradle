@@ -40,6 +40,9 @@ dependencies {
 	
 	// https://mvnrepository.com/artifact/org.antlr/symtab
 	compile group: 'org.antlr', name: 'symtab', version: '1.0.8'
+	// https://mvnrepository.com/artifact/com.scalified/tree
+	compile group: 'com.scalified', name: 'tree', version: '0.2.2'
+	
 	
     //// This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:21.0'
