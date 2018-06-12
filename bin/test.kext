@@ -5,10 +5,13 @@ void main(){
 	Tree xmlTree;
 	Tree xmlTree1=1+3*6;
 	int sum=15+16+17*3;
-	Tree xmlTree2=openFile("quotes.xml");
 	saveUrl("http://quotes.toscrape.com/tag/love/","quotes2.xml");
-	Tree xmlTree3=openFile("quotes2.xml");
-	Tree xmlTree4=xmlTree2+xmlTree3;
+	HtmlDocument doc=openUrl("http://quotes.toscrape.com/tag/love/");
+	Tree booksXmlTree1=openFile("books1.xml");
+	Tree booksXmlTree2=openFile("books2.xml");
+	Tree booksXmlTree=booksXmlTree1+booksXmlTree2;
+	Tree commentsXmlTree=openFile("comments.xml");
+	Tree xmlTree4=join(booksXmlTree,commentsXmlTree,"booksXmlTree.id","commentsXmlTree.bookid");
 	
 }
 

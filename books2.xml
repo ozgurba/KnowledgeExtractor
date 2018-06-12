@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<x:books xmlns:x="urn:books">
+   <book id="bk003">
+      <author>Third Writer</author>
+      <title>The Third Book</title>
+      <genre>Romance</genre>
+      <price>47.5</price>
+      <pub_date>2006-11-18</pub_date>
+   </book>
+   <book id="bk004">
+      <author>Turkish Writer</author>
+      <title>The Poet's Third Poem</title>
+      <genre>Poem</genre>
+      <price>4.35</price>
+   </book>
+</x:books>

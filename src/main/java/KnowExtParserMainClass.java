@@ -41,11 +41,12 @@ public class KnowExtParserMainClass {
         JPanel panel = new JPanel();
         TreeViewer viewr = new TreeViewer(Arrays.asList(
                 parser.getRuleNames()),tree);
-        viewr.setScale(1);//scale a little
+        viewr.setScale(0.8);//scale a little
         panel.add(viewr);
         frame.add(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1000,1000);
+        
         frame.setVisible(true);
 
 	}

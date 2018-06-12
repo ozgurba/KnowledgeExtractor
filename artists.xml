@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO8859-1" ?>
+<x:artists xmlns:x="urn:artists">
+
+ <artist>
+    <name>Bob Dylan</name>
+    <COUNTRY>USA</COUNTRY>
+    <popularity>Min</popularity>
+    <birthyear>1945</birthyear>
+  </artist>
+  
+  <artist>
+    <name>Bonnie Tylor</name>
+    <COUNTRY>USA</COUNTRY>
+    <popularity>Max</popularity>
+    <birthyear>1955</birthyear>
+  </artist>
+    <artist>
+    <name>Dolly Parton</name>
+    <COUNTRY>USA</COUNTRY>
+    <popularity>Max</popularity>
+    <birthyear>1955</birthyear>
+  </artist>
+  
+</x:artists>

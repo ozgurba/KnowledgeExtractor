@@ -9,6 +9,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import crawler.JSoupCrawler;
+import entity.HtmlDocument;
 import entity.Tree;
 
 public class KnowExtEngine {
@@ -33,14 +34,14 @@ public class KnowExtEngine {
 		}
 	}
 
-	public Tree openUrl(String url) {
+	public HtmlDocument openUrl(String url) {
 
 		try {
 			Document doc = Jsoup.connect(url).get();
 			String title = doc.title();
 			logger.info("openUrl:" + url + " title:" + title);
-			Tree t = new Tree(doc);
-			return t;
+			HtmlDocument htmlDocument = new HtmlDocument(doc);
+			return htmlDocument;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

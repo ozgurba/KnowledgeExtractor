@@ -92,6 +92,8 @@ primitiveType
 complexType
 	:	LIST
 	|	TREE
+	|	HTMLDOCUMENT
+	|	MATRIX
 	|	SET
 	;	
 

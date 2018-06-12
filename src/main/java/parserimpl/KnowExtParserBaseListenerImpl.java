@@ -10,6 +10,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.log4j.Logger;
 
+import entity.HtmlDocument;
 import entity.NodeAttributes;
 import entity.Tree;
 import entity.enums.EnumValues;
@@ -139,8 +140,8 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 			case "openUrl":
 				NodeAttributes fileNameToOpenUrl = (NodeAttributes) globalSymbolTable
 						.get(exprList.expr(0).primary().literal());
-				Tree t = knowExtengine.openUrl(fileNameToOpenUrl.getValue().toString());
-				nodeAttributes.value(t).scope(ScopeType.GLOBAL).type(EnumValues.NodeType.TREE);
+				HtmlDocument htmlDocument = knowExtengine.openUrl(fileNameToOpenUrl.getValue().toString());
+				nodeAttributes.value(htmlDocument).scope(ScopeType.GLOBAL).type(EnumValues.NodeType.TREE);
 				globalSymbolTable.put(ctx, nodeAttributes);
 				logger.info("openUrl Method Exit" + exprList.getText());
 				break;
