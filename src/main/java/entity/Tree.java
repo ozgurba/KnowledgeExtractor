@@ -23,5 +23,9 @@ public class Tree {
 	public String toString() {
 		return "Tree [doc=" + doc + "]";
 	}
+	//TODO implement 
+	public boolean isCompatible(Tree otherTree) {
+		return true;
+	}
 
 }

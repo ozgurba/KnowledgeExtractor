@@ -13,6 +13,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.jsoup.nodes.Document;
 
 import entity.HtmlDocument;
 import entity.NodeAttributes;
@@ -21,6 +22,7 @@ import entity.enums.EnumValues;
 import entity.enums.EnumValues.NodeType;
 import entity.enums.EnumValues.ScopeType;
 import exception.ParserException;
+import operation.TreeOperations;
 import parser.KnowExtParser;
 import parser.KnowExtParser.ComplexTypeContext;
 import parser.KnowExtParser.ExprContext;
@@ -252,8 +254,9 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 		} else if (NodeType.TREE.equals(resultType)) {
 			Tree result = addTree((Tree) expr1Value, (Tree) expr2Value);
 			return result;
+		} else {
+			throw new UnsupportedOperationException("Incmpatible types:"+resultType);
 		}
-		return null;
 
 	}
 
@@ -282,8 +285,9 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 
 	private Tree addTree(Tree expr1Value, Tree expr2Value) {
 		logger.info("Add Tree Operation:"+expr1Value+" + "+expr2Value);
+		Tree resultValue=TreeOperations.add(expr1Value, expr2Value);
 		// TODO Auto-generated method stub
-		return null;
+		return resultValue;
 	}
 
 	private NodeType isCompatible(NodeType expr1Type, NodeType expr2Type) {
@@ -465,7 +469,7 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 				try {
 					throw new ParserException(
 							"Invalid type assignment: " + ((NodeAttributes) nodeAttributes).getValue().getClass()
-									+ " is assigned to " + NodeType.TREE + " type");
+									+ " is assigned to " + type + " type");
 				} catch (ParserException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

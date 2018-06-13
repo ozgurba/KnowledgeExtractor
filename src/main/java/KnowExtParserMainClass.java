@@ -30,6 +30,7 @@ public class KnowExtParserMainClass {
 		CommonTokenStream tokens = new CommonTokenStream(knowExtLexer);
 		KnowExtParser parser = new KnowExtParser(tokens);
 		ParseTree tree = parser.file();
+		showAst(parser, tree);
 		System.out.println("Parse Tree of File("+SRC_MAIN_ANTLR_TEST_KEXT+"):" + tree.toStringTree(parser));
 
 		ParseTreeWalker walker = new ParseTreeWalker(); // create standard walker
@@ -38,6 +39,10 @@ public class KnowExtParserMainClass {
 		walker.walk(extractor, tree); // initiate walk of tree with listener
 		System.out.println(tree.toStringTree(parser));
 		extractor.writeMemoryToFile();
+
+	}
+
+	private static void showAst(KnowExtParser parser, ParseTree tree) {
 		//show AST in GUI
         JFrame frame = new JFrame("Antlr AST");
         JPanel panel = new JPanel();
@@ -50,7 +55,6 @@ public class KnowExtParserMainClass {
         frame.setSize(1000,1000);
         
         frame.setVisible(true);
-
 	}
 
 	public static void initializeLog4J() {
