@@ -95,6 +95,7 @@ complexType
 	|	HTMLDOCUMENT
 	|	MATRIX
 	|	SET
+	|	STRING
 	;	
 
 

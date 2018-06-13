@@ -21,21 +21,23 @@ import parserimpl.KnowExtParserBaseListenerImpl;
 
 public class KnowExtParserMainClass {
 
+	private static final String SRC_MAIN_ANTLR_TEST_KEXT = "src/main/antlr/test.kext";
+
 	public static void main(String[] args) throws IOException {
 		initializeLog4J();
-		CharStream charStream = CharStreams.fromFileName("src/main/antlr/test.kext");
+		CharStream charStream = CharStreams.fromFileName(SRC_MAIN_ANTLR_TEST_KEXT);
 		KnowExtLexer knowExtLexer = new KnowExtLexer(charStream);
 		CommonTokenStream tokens = new CommonTokenStream(knowExtLexer);
 		KnowExtParser parser = new KnowExtParser(tokens);
 		ParseTree tree = parser.file();
-		System.out.println("1:" + tree.toStringTree(parser));
+		System.out.println("Parse Tree of File("+SRC_MAIN_ANTLR_TEST_KEXT+"):" + tree.toStringTree(parser));
 
 		ParseTreeWalker walker = new ParseTreeWalker(); // create standard walker
 		KnowExtEngine knowExtEngine = new KnowExtEngine();
 		KnowExtParserBaseListenerImpl extractor = new KnowExtParserBaseListenerImpl(parser, knowExtEngine);
 		walker.walk(extractor, tree); // initiate walk of tree with listener
 		System.out.println(tree.toStringTree(parser));
-		extractor.writeMemory();
+		extractor.writeMemoryToFile();
 		//show AST in GUI
         JFrame frame = new JFrame("Antlr AST");
         JPanel panel = new JPanel();

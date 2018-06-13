@@ -23,6 +23,7 @@ NEW:				'new';
 RETURN:             'return';
 SHORT:              'short';
 SWITCH:             'switch';
+STRING:				'String';
 WHILE: 				'while';
 TREE:				'Tree';
 THROW:				'throw';

@@ -1,5 +1,8 @@
 package parserimpl;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -8,6 +11,7 @@ import java.util.Set;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import entity.HtmlDocument;
@@ -31,18 +35,8 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 	public KnowExtParser parser;
 	public boolean isMainMethod;
 	public KnowExtEngine knowExtengine;
-	Map<ParseTree, Object> globalSymbolTable = new HashMap<ParseTree, Object>();
+	Map<ParseTree, NodeAttributes> globalSymbolTable = new HashMap<ParseTree, NodeAttributes>();
 	Set<NodeAttributes> globalObjectMemorySet = new HashSet<NodeAttributes>();
-
-	// TODO Change Symbol Table to Maven...
-
-	public void setValue(ParseTree node, int value) {
-		globalSymbolTable.put(node, value);
-	}
-
-	public Object getValue(ParseTree node) {
-		return globalSymbolTable.get(node);
-	}
 
 	public void writeMemory() {
 		System.out.println("Program Symbol Table: size of " + globalSymbolTable.size());
@@ -53,7 +47,23 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 		for (NodeAttributes nodeAttributes : globalObjectMemorySet)
 			System.out.println(nodeAttributes.toString());
 	}
-
+	public void writeMemoryToFile() {
+		StringBuffer memoryOutputStr=new StringBuffer();
+		memoryOutputStr.append("Program Symbol Table: size of " + globalSymbolTable.size()+"\n");
+		for (ParseTree key : globalSymbolTable.keySet()) {
+			memoryOutputStr.append(key.getText() + ":" + globalSymbolTable.get(key)+"\n-----END OF KEYSET----\n");
+		}
+		memoryOutputStr.append("Program Object Memory:   size of " + globalObjectMemorySet.size()+"\n");
+		for (NodeAttributes nodeAttributes : globalObjectMemorySet)
+			memoryOutputStr.append(nodeAttributes.toString()+"\n-----END OF MEMORY ITEM----\n");
+		File file = new File("memory.txt");
+		try {
+			FileUtils.writeStringToFile(file, memoryOutputStr.toString(),Charset.defaultCharset());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	public KnowExtParserBaseListenerImpl(KnowExtParser pparser, KnowExtEngine pKnowExtengine) {
 		this.parser = pparser;
 		knowExtengine = pKnowExtengine;
@@ -150,11 +160,6 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 				break;
 
 			}
-		} else if (ctx.ASSIGN() != null) {
-			ExprContext expr1 = ctx.expr(0);
-			ExprContext expr2 = ctx.expr(1);
-			logger.info("Assign Operation:" + expr1.getText() + " :=: " + expr2.getText());
-			globalSymbolTable.put(expr1, globalSymbolTable.get(expr2));
 		} else if (ctx.ADD() != null || ctx.SUB() != null || ctx.MUL() != null || ctx.DIV() != null) {
 			ExprContext expr1 = ctx.expr(0);
 			ExprContext expr2 = ctx.expr(1);
@@ -270,11 +275,13 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 	}
 
 	private Tree substractTree(Tree expr1Value, Tree expr2Value) {
+		logger.info("Substract Tree Operation:"+expr1Value+" + "+expr2Value);
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	private Tree addTree(Tree expr1Value, Tree expr2Value) {
+		logger.info("Add Tree Operation:"+expr1Value+" + "+expr2Value);
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -288,6 +295,8 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 		} else if ((NodeType.INT.equals(expr1Type) && NodeType.DOUBLE.equals(expr2Type))
 				|| (NodeType.INT.equals(expr2Type) && NodeType.DOUBLE.equals(expr1Type))) {
 			return NodeType.DOUBLE;
+		} else if(NodeType.TREE.equals(expr1Type)&&NodeType.TREE.equals(expr2Type)) {
+			return NodeType.TREE;
 		}
 		return null;
 	}
@@ -384,32 +393,34 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 			if (ctx.typeType().complexType() != null) {
 				ComplexTypeContext complexType = ctx.typeType().complexType();
 				if (complexType.TREE() != null) {
-					extractType(ctx, identifier, NodeType.TREE);
+					extractTypeAndAssign(ctx, identifier, NodeType.TREE);
 				} else if (complexType.LIST() != null) {
-					extractType(ctx, identifier, NodeType.LIST);
+					extractTypeAndAssign(ctx, identifier, NodeType.LIST);
 				} else if (complexType.SET() != null) {
-					extractType(ctx, identifier, NodeType.SET);
+					extractTypeAndAssign(ctx, identifier, NodeType.SET);
+				} else if (complexType.STRING() != null) {
+					extractTypeAndAssign(ctx, identifier, NodeType.STRING);
 				}
 			} else {
 				PrimitiveTypeContext primitiveType = ctx.typeType().primitiveType();
 
 				if (primitiveType != null) {
 					if (primitiveType.INT() != null) {
-						extractType(ctx, identifier, NodeType.INT);
+						extractTypeAndAssign(ctx, identifier, NodeType.INT);
 					} else if (primitiveType.CHAR() != null) {
-						extractType(ctx, identifier, NodeType.CHAR);
+						extractTypeAndAssign(ctx, identifier, NodeType.CHAR);
 					} else if (primitiveType.BOOLEAN() != null) {
-						extractType(ctx, identifier, NodeType.BOOL);
+						extractTypeAndAssign(ctx, identifier, NodeType.BOOL);
 					} else if (primitiveType.LONG() != null) {
-						extractType(ctx, identifier, NodeType.LONG);
+						extractTypeAndAssign(ctx, identifier, NodeType.LONG);
 					} else if (primitiveType.DOUBLE() != null) {
-						extractType(ctx, identifier, NodeType.DOUBLE);
+						extractTypeAndAssign(ctx, identifier, NodeType.DOUBLE);
 					} else if (primitiveType.FLOAT() != null) {
-						extractType(ctx, identifier, NodeType.FLOAT);
+						extractTypeAndAssign(ctx, identifier, NodeType.FLOAT);
 					} else if (primitiveType.SHORT() != null) {
-						extractType(ctx, identifier, NodeType.SHORT);
+						extractTypeAndAssign(ctx, identifier, NodeType.SHORT);
 					} else if (primitiveType.BYTE() != null) {
-						extractType(ctx, identifier, NodeType.BYTE);
+						extractTypeAndAssign(ctx, identifier, NodeType.BYTE);
 					} else {
 						try {
 							throw new ParserException("Unsupported Primitive Type:" + primitiveType);
@@ -424,6 +435,13 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 
 				}
 			}
+		} else {
+			try {
+				throw new ParserException("No typetype expression!:");
+			} catch (ParserException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -437,22 +455,23 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 	 * @throws ParserException
 	 */
 
-	private void extractType(KnowExtParser.VarDeclContext ctx, TerminalNode identifier, NodeType type) {
+	private NodeAttributes extractTypeAndAssign(KnowExtParser.VarDeclContext ctx, TerminalNode identifier, NodeType type) {
 		NodeAttributes nodeAttributes = new NodeAttributes();
 		nodeAttributes.type(type).scope(ScopeType.GLOBAL).name(identifier.getText());
-		if (ctx.expr() != null) {
-			Object value = globalSymbolTable.get(ctx.expr());
-			if (!isSuitableToGivenType(type, value)) {
+		if (ctx.ASSIGN() != null) {
+			NodeAttributes nodeAttributestoAssigned = globalSymbolTable.get(ctx.expr());
+			logger.info("Assignment Operation:"+identifier.getText()+" to "+nodeAttributestoAssigned);
+			if (!isSuitableToGivenType(type, nodeAttributes)) {
 				try {
 					throw new ParserException(
-							"Invalid type assignment: " + ((NodeAttributes) value).getValue().getClass()
+							"Invalid type assignment: " + ((NodeAttributes) nodeAttributes).getValue().getClass()
 									+ " is assigned to " + NodeType.TREE + " type");
 				} catch (ParserException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			} else {
-				nodeAttributes.setValue(value);
+				nodeAttributes.setValue(nodeAttributestoAssigned.getValue());
 			}
 		}
 		if (!globalObjectMemorySet.add(nodeAttributes)) {
@@ -463,6 +482,7 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 				e.printStackTrace();
 			}
 		}
+		return nodeAttributes;
 	}
 
 	private boolean isSuitableToGivenType(NodeType type, Object value) {
