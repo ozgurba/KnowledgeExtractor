@@ -1,12 +1,16 @@
 // KnowExt test
 
 void main(){
-	String p="str"+((8+9)-7*5)/6;
+	/*String p="str"+((8+9)-7*5)/6;
 	Tree xmlTree;
 	//Tree xmlTree1=1+3*6;
 	int sum=15+16+17*3;
 	saveUrl("http://quotes.toscrape.com/tag/love/","quotes2.xml");
-	HtmlDocument doc=openUrl("http://quotes.toscrape.com/tag/love/");
+	HtmlDocument doc=openUrl("http://quotes.toscrape.com/tag/love/");*/
+	int sum;
+	sum=15+16;
+	int y;
+	y=sum+14;
 	Tree booksXmlTree1=openFile("books1.xml");
 	Tree booksXmlTree2=openFile("books2.xml");
 	Tree booksXmlTree=booksXmlTree1+booksXmlTree2;

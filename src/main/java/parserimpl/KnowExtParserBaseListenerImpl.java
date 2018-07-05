@@ -22,6 +22,7 @@ import entity.enums.EnumValues;
 import entity.enums.EnumValues.NodeType;
 import entity.enums.EnumValues.ScopeType;
 import exception.ParserException;
+import memory.GlobalSymbolTable;
 import operation.TreeOperations;
 import parser.KnowExtParser;
 import parser.KnowExtParser.ComplexTypeContext;
@@ -37,7 +38,7 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 	public KnowExtParser parser;
 	public boolean isMainMethod;
 	public KnowExtEngine knowExtengine;
-	Map<ParseTree, NodeAttributes> globalSymbolTable = new HashMap<ParseTree, NodeAttributes>();
+	GlobalSymbolTable globalSymbolTable = new GlobalSymbolTable();
 	Set<NodeAttributes> globalObjectMemorySet = new HashSet<NodeAttributes>();
 
 	public void writeMemory() {
@@ -183,7 +184,7 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 						resultValue = divide(expr1Value, expr2Value, resultType);
 					NodeAttributes nodeAttributes = new NodeAttributes();
 					nodeAttributes.value(resultValue).type(resultType);
-					globalSymbolTable.put(ctx, nodeAttributes);
+					globalSymbolTable.put(ctx, nodeAttributes);				
 					logger.info("Adding/Substract/Multiply/Divide Operation:" + expr1.getText() + ":OP:"
 							+ expr2.getText() + "=" + resultValue);
 				} else {
@@ -207,6 +208,30 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 			globalSymbolTable.put(ctx, nodeAttributes);
 		} else if (ctx.primary() != null) {
 			globalSymbolTable.put(ctx, globalSymbolTable.get(ctx.primary()));
+		} else if(ctx.ASSIGN()!=null) {
+			ExprContext expr1 = ctx.expr(0);
+			ExprContext expr2 = ctx.expr(1);
+			NodeAttributes node1Attributes = (NodeAttributes) globalSymbolTable.get(expr1);
+			EnumValues.NodeType expr1Type = node1Attributes.getType();
+			EnumValues.NodeType expr2Type = ((NodeAttributes) globalSymbolTable.get(expr2)).getType();
+			Object expr2Value = ((NodeAttributes) globalSymbolTable.get(expr2)).getValue();
+			NodeAttributes nodeAttributes = new NodeAttributes();
+			nodeAttributes.type(expr2Type).name(node1Attributes.getName());
+			logger.info("Assignment Operation:"+expr1+" to "+expr2);
+			if (!isSuitableToGivenType(expr1Type, nodeAttributes)) {
+				try {
+					throw new ParserException(
+							"Invalid type assignment: " + ((NodeAttributes) nodeAttributes).getValue().getClass()
+									+ " is assigned to " + expr2Type + " type");
+				} catch (ParserException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				nodeAttributes.setValue(expr2Value);
+			}
+			globalObjectMemorySet.add(nodeAttributes);
+			globalSymbolTable.put(ctx, nodeAttributes);			
 		}
 
 	}
@@ -286,7 +311,6 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 	private Tree addTree(Tree expr1Value, Tree expr2Value) {
 		logger.info("Add Tree Operation:"+expr1Value+" + "+expr2Value);
 		Tree resultValue=TreeOperations.add(expr1Value, expr2Value);
-		// TODO Auto-generated method stub
 		return resultValue;
 	}
 
@@ -394,37 +418,39 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 	public void exitVarDecl(KnowExtParser.VarDeclContext ctx) {
 		if (ctx.typeType() != null) {
 			TerminalNode identifier = ctx.IDENTIFIER();
+			NodeAttributes nodeAttributes=null;
 			if (ctx.typeType().complexType() != null) {
 				ComplexTypeContext complexType = ctx.typeType().complexType();
 				if (complexType.TREE() != null) {
-					extractTypeAndAssign(ctx, identifier, NodeType.TREE);
+					nodeAttributes=extractTypeAndAssign(ctx, identifier, NodeType.TREE);
 				} else if (complexType.LIST() != null) {
-					extractTypeAndAssign(ctx, identifier, NodeType.LIST);
+					nodeAttributes=extractTypeAndAssign(ctx, identifier, NodeType.LIST);
 				} else if (complexType.SET() != null) {
-					extractTypeAndAssign(ctx, identifier, NodeType.SET);
+					nodeAttributes=extractTypeAndAssign(ctx, identifier, NodeType.SET);
 				} else if (complexType.STRING() != null) {
-					extractTypeAndAssign(ctx, identifier, NodeType.STRING);
+					nodeAttributes=extractTypeAndAssign(ctx, identifier, NodeType.STRING);
 				}
+				
 			} else {
 				PrimitiveTypeContext primitiveType = ctx.typeType().primitiveType();
 
 				if (primitiveType != null) {
 					if (primitiveType.INT() != null) {
-						extractTypeAndAssign(ctx, identifier, NodeType.INT);
+						nodeAttributes=extractTypeAndAssign(ctx, identifier, NodeType.INT);
 					} else if (primitiveType.CHAR() != null) {
-						extractTypeAndAssign(ctx, identifier, NodeType.CHAR);
+						nodeAttributes=extractTypeAndAssign(ctx, identifier, NodeType.CHAR);
 					} else if (primitiveType.BOOLEAN() != null) {
-						extractTypeAndAssign(ctx, identifier, NodeType.BOOL);
+						nodeAttributes=extractTypeAndAssign(ctx, identifier, NodeType.BOOL);
 					} else if (primitiveType.LONG() != null) {
-						extractTypeAndAssign(ctx, identifier, NodeType.LONG);
+						nodeAttributes=extractTypeAndAssign(ctx, identifier, NodeType.LONG);
 					} else if (primitiveType.DOUBLE() != null) {
-						extractTypeAndAssign(ctx, identifier, NodeType.DOUBLE);
+						nodeAttributes=extractTypeAndAssign(ctx, identifier, NodeType.DOUBLE);
 					} else if (primitiveType.FLOAT() != null) {
-						extractTypeAndAssign(ctx, identifier, NodeType.FLOAT);
+						nodeAttributes=extractTypeAndAssign(ctx, identifier, NodeType.FLOAT);
 					} else if (primitiveType.SHORT() != null) {
-						extractTypeAndAssign(ctx, identifier, NodeType.SHORT);
+						nodeAttributes=extractTypeAndAssign(ctx, identifier, NodeType.SHORT);
 					} else if (primitiveType.BYTE() != null) {
-						extractTypeAndAssign(ctx, identifier, NodeType.BYTE);
+						nodeAttributes=extractTypeAndAssign(ctx, identifier, NodeType.BYTE);
 					} else {
 						try {
 							throw new ParserException("Unsupported Primitive Type:" + primitiveType);
@@ -439,6 +465,8 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 
 				}
 			}
+			if(nodeAttributes!=null)
+			globalSymbolTable.put(ctx, nodeAttributes);
 		} else {
 			try {
 				throw new ParserException("No typetype expression!:");
@@ -497,7 +525,6 @@ public class KnowExtParserBaseListenerImpl extends KnowExtParserBaseListener {
 			isSuitable = ((NodeAttributes) value).getValue().getClass().isAssignableFrom(Tree.class);
 		} else if (type.equals(NodeType.SET)) {
 			isSuitable = Set.class.isAssignableFrom(((NodeAttributes) value).getValue().getClass());
-
 		} else if (type.equals(NodeType.LIST)) {
 			isSuitable = List.class.isAssignableFrom(((NodeAttributes) value).getValue().getClass());
 		} else if (type.equals(NodeType.INT)) {
